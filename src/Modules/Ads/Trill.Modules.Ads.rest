@@ -1,0 +1,57 @@
+@url = http://localhost:5000/ads-module
+@userId = b7768065-835a-4002-9260-63c99b93bd88
+@adId = 515a50b5-15b2-4b7c-aedc-d602cf31c2b2
+
+###
+GET {{url}}
+
+###
+GET {{url}}/ads
+
+###
+GET {{url}}/ads/{{adId}}
+
+###
+POST {{url}}/ads
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "header": "My ad #1",
+  "content": "Lorem ipsum ad #1",
+  "tags": ["dotnet"],
+  "from": "2020-11-14",
+  "to": "2020-12-10"
+}
+
+###
+PUT {{url}}/ads/{{{adId}}/approve
+Content-Type: application/json
+
+{
+  "adId": "{{adId}}"
+}
+
+###
+PUT {{url}}/ads/{{{adId}}/reject
+Content-Type: application/json
+
+{
+  "adId": "{{adId}}"
+}
+
+###
+PUT {{url}}/ads/{{{adId}}/pay
+Content-Type: application/json
+
+{
+  "adId": "{{adId}}"
+}
+
+###
+PUT {{url}}/ads/{{{adId}}/publish
+Content-Type: application/json
+
+{
+  "adId": "{{adId}}"
+}

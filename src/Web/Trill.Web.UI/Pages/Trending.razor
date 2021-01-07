@@ -1,0 +1,79 @@
+﻿@page "/trending"
+@using Trill.Web.Core.Analytics
+@using Trill.Web.Core.Analytics.DTO
+@using Trill.Web.Core.Shared.DTO
+@using Trill.Web.UI.Services
+@inject IAnalyticsService AnalyticsService
+@inject IApiResponseHandler ApiResponseHandler
+@inject MessageService MessageService
+
+<Title Level="3">Trending</Title>
+
+<Tabs DefaultActiveKey="1">
+    <TabPane Key="1">
+        <Tab>Stories</Tab>
+        <ChildContent>
+            @if (_stories is {})
+            {
+                @foreach (var story in _stories)
+                {
+                    <Story Model="@story" />
+                }
+            }
+        </ChildContent>
+    </TabPane>
+    <TabPane Key="2">
+        <Tab>Users</Tab>
+        <ChildContent>
+                @if (_users is {})
+                {
+                    @foreach (var user in _users)
+                    {
+                        <User Model="@user" />
+                    }
+                }
+        </ChildContent>
+    </TabPane>
+    <TabPane Key="3">
+        <Tab>Tags</Tab>
+        <ChildContent>
+            @if (_tags is {})
+            {
+                @foreach (var tag in _tags)
+                {
+                    <Tag Style="font-size: 14px; padding: 10px; margin: 10px">
+                        <a href="@($"/search?query={tag.Name}")">@tag.Name [@tag.OccurenceCount]</a>
+                    </Tag>
+                    <br/>
+                }
+            }
+        </ChildContent>
+    </TabPane>
+</Tabs>
+
+@code {
+    private IEnumerable<StoryDto> _stories;
+    private IEnumerable<UserDto> _users;
+    private IEnumerable<TagDto> _tags;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _stories = await ApiResponseHandler.HandleAsync(AnalyticsService.GetTopStoriesAsync());
+        _users = await ApiResponseHandler.HandleAsync(AnalyticsService.GetTopUsersAsync());
+        _tags = await ApiResponseHandler.HandleAsync(AnalyticsService.GetTopTagsAsync());
+        await MessageService.Loading("Fetching the trending data...", 1);
+        if (_stories is null)
+        {
+            await MessageService.Error("Couldn't load the trending stories :(", 1);
+        }
+        if (_users is null)
+        {
+            await MessageService.Error("Couldn't load the trending users :(", 1);
+        }
+        if (_tags is null)
+        {
+            await MessageService.Error("Couldn't load the trending tags :(", 1);
+        }
+    }
+
+}

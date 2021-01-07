@@ -1,0 +1,53 @@
+﻿@page "/account"
+@using Microsoft.AspNetCore.Authorization
+@using Trill.Web.Core.Shared.DTO
+@using Trill.Web.Core.Users
+@using Trill.Web.UI.Services
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+@inject IUsersService UsersService
+@inject IAuthenticationService AuthenticationService
+@inject IApiResponseHandler ApiResponseHandler
+@inject MessageService MessageService
+
+<Title Level="3">Hello @AuthenticationService.User.Name</Title>
+
+@if (_user is {})
+{
+    <Descriptions Bordered>
+        <DescriptionsItem Title="@("ID")">@_user.Id.ToString("N")</DescriptionsItem>
+        <DescriptionsItem Title="@("Email")">@_user.Email</DescriptionsItem>
+        <DescriptionsItem Title="@("Funds")">@_user.Funds.ToString("C")</DescriptionsItem>
+        <DescriptionsItem Title="@("Role")">@_user.Role</DescriptionsItem>
+        <DescriptionsItem Title="@("Permissions")">@string.Join(",", _user.Permissions)</DescriptionsItem>
+    </Descriptions>
+}
+
+<br/>
+<br/>
+<Button Type="primary" Icon="logout" Size="Large" OnClick="LogoutAsync">
+    Logout
+</Button>
+
+@code{
+
+    private Guid _userId;
+    private UserDetailsDto _user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _userId = AuthenticationService.User.Id;
+        _user = await ApiResponseHandler.HandleAsync(UsersService.GetAsync(_userId));
+        await MessageService.Loading("Fetching your account...", 1);
+        if (_user is null)
+        {
+            await MessageService.Error("Couldn't load your account :(", 1);
+        }
+    }
+
+    private async Task LogoutAsync()
+    {
+        NavigationManager.NavigateTo("logout");
+        await MessageService.Info("Signed out.", 1);
+    }
+}

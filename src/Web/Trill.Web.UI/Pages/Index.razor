@@ -1,0 +1,243 @@
+﻿@page "/"
+@using Trill.Web.Core
+@using Trill.Web.Core.Stories
+@using Trill.Web.Core.Analytics
+@using Trill.Web.Core.Analytics.DTO
+@using Trill.Web.Core.Shared.DTO
+@using System.ComponentModel.DataAnnotations
+@using Trill.Web.Core.Stories.Requests
+@using Trill.Web.Core.Timelines
+@using Trill.Web.UI.Services
+@inject MessageService MessageService
+@inject IStoriesService StoriesService
+@inject ITimelineService TimelineService
+@inject IAnalyticsService AnalyticsService
+@inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationService
+@inject IApiResponseHandler ApiResponseHandler
+
+<Search Style="width: 100%; padding-bottom:20px;" Placeholder="Trill search..." Size="@InputSize.Large"  @bind-Value="@Query" EnterButton="@("Search")" OnSearch="OnSearch"/>
+
+<Row>
+    <Col Span="18">
+        <Row>
+            <Col Span="21">
+                <Title Level="3">@_title</Title>
+            </Col>
+
+            <Col Span="3">
+                @if (AuthenticationService.User is {})
+                {
+                    <Tooltip Placement="PlacementType.TopLeft" Title="@("Recent stories / Timeline")">
+                        <Switch Checked="_displayTimeline" OnChange="TimelineSwitchChanged"/>
+                    </Tooltip>
+                }
+            </Col>
+        </Row>
+        @if (AuthenticationService.User is {})
+        {
+            <Button Type="primary" Icon="plus" OnClick="@ShowSendStoryModal">
+                Send a story
+            </Button>
+        }
+        @if (_stories is {})
+        {
+            if (!_loadingStories && _stories.Empty)
+            {
+                <Title Level="4">There are no stories yet.</Title>
+            }
+            @foreach (var result in _stories.Items)
+            {
+                <Story Model="@result"/>
+            }
+        }
+        else if (!_storiesAvailable)
+        {
+            <Tag Style="font-size: 14px; padding: 10px; margin-top: 30px" Color="red">Couldn't load the stories :(</Tag>
+        }
+    </Col>
+    <Col Span="6">
+        <Title Level="3">Popular tags</Title>
+        @if (_tags is {})
+        {
+            @foreach (var tag in _tags)
+            {
+                <Tag Style="font-size: 14px; padding: 10px; margin: 10px">
+                    <a href="@($"/search?query={tag.Name}")">@tag.Name</a>
+                </Tag>
+            }
+        }
+        else if (!_trendingAvailable)
+        {
+            <Tag Style="font-size: 14px; padding: 10px; margin: 10px" Color="red">Couldn't load the popular tags :(</Tag>
+        }
+    </Col>
+</Row>
+
+<Modal Title="@("New story")"
+       Visible="@_sendStoryModalVisible"
+       Style="width: 800px; height: 600px"
+       OnCancel="@HandleCancel"
+       Footer="_footer">
+    <Form Loading="_formLoading" Model="@_sendStoryModel" Style="padding-top: 50px"
+          LabelCol="new ColLayoutParam {Span = 2}"
+          WrapperCol="new ColLayoutParam {Span = 20}"
+          OnFinish="SendStoryAsync">
+        <FormItem Label="Title" >
+            <Input @bind-Value="@context.Title"/>
+        </FormItem>
+        <FormItem Label="Text">
+            <TextArea style="height: 200px" @bind-Value="@context.Text"/>
+        </FormItem>
+        <FormItem Label="Tags">
+            <Input placeholder="Comma separated tags" @bind-Value="@context.Tags"/>
+        </FormItem>
+        <FormItem WrapperCol="new ColLayoutParam {Offset = 18, Span = 6}">
+            <Button OnClick="@HandleCancel">Cancel</Button>
+            <Button HtmlType="submit" Type="primary" Loading="@_sendingStory">
+                Send
+            </Button>
+        </FormItem>
+    </Form>
+</Modal>
+
+@code{
+
+    readonly RenderFragment _footer = @<Template>
+                                      </Template>;
+
+    private PagedDto<StoryDto> _stories;
+    private IEnumerable<TagDto> _tags;
+    private bool _trendingAvailable = true;
+    private bool _storiesAvailable = true;
+    private bool _sendStoryModalVisible;
+    private bool _sendingStory;
+    private bool _loadingStories;
+    private bool _formLoading = false;
+    private bool _displayTimeline = false;
+    private string _title = "Recent stories";
+
+    private string Query { get; set; }
+
+    private void ShowSendStoryModal()
+    {
+        _sendStoryModalVisible = true;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRecentStoriesAsync();
+        _tags = await ApiResponseHandler.HandleAsync(AnalyticsService.GetTopTagsAsync());
+        if (_tags is null)
+        {
+            await MessageService.Error("Couldn't load the trending tags :(", 1);
+        }
+    }
+
+    private async Task LoadRecentStoriesAsync(bool displayMessage = true)
+    {
+        _loadingStories = true;
+        _stories = new PagedDto<StoryDto>();
+        if (displayMessage)
+        {
+            await MessageService.Loading("Fetching the recent stories...", 1);
+        }
+        _stories = await ApiResponseHandler.HandleAsync(StoriesService.BrowseAsync(string.Empty, AuthenticationService.User?.Id));
+        _loadingStories = false;
+        if (_stories is null)
+        {
+            await MessageService.Error("Couldn't load the recent stories :(", 1);
+        }
+        MessageService.Destroy();
+    }
+
+    private async Task LoadTimelineAsync()
+    {
+        _loadingStories = true;
+        _stories = new PagedDto<StoryDto>();
+        await MessageService.Loading("Fetching the timeline...", 1);
+        _stories = await ApiResponseHandler.HandleAsync(TimelineService.GetAsync(AuthenticationService.User.Id));
+        _loadingStories = false;
+        if (_stories is null)
+        {
+            await MessageService.Error("Couldn't load the timeline :(", 1);
+        }
+        MessageService.Destroy();
+    }
+
+    private async Task OnSearch()
+    {
+        if (string.IsNullOrWhiteSpace(Query))
+        {
+            return;
+        }
+
+        await MessageService.Loading("Searching...", 1);
+        NavigationManager.NavigateTo($"search?query={Query}");
+        MessageService.Destroy();
+    }
+
+    private async Task SendStoryAsync()
+    {
+        _sendingStory = true;
+        var request = new SendStoryRequest
+        {
+            Title = _sendStoryModel.Title,
+            Text = _sendStoryModel.Text,
+            Tags = _sendStoryModel.Tags.Split(","),
+        };
+        var response = await ApiResponseHandler.HandleAsync(StoriesService.SendAsync(request));
+        _sendingStory = false;
+        if (response.Succeeded)
+        {
+            _sendStoryModalVisible = false;
+            _sendStoryModel.Title = string.Empty;
+            _sendStoryModel.Text = string.Empty;
+            _sendStoryModel.Tags = string.Empty;
+            await MessageService.Info("Your story has been sent.", 1);
+            await LoadRecentStoriesAsync(false);
+        }
+    }
+
+    private void HandleCancel(MouseEventArgs e)
+    {
+        _sendStoryModalVisible = false;
+    }
+
+    private class SendStoryModel
+    {
+        [Required]
+        [MinLength(3)]
+        [MaxLength(100)]
+        public string Title { get; set; }
+
+        [Required]
+        [MinLength(10)]
+        [MaxLength(1000)]
+        public string Text { get; set; }
+
+        [Required]
+        [MinLength(3)]
+        [MaxLength(100)]
+        public string Tags { get; set; }
+    }
+
+    private readonly SendStoryModel _sendStoryModel = new SendStoryModel();
+
+    private async Task TimelineSwitchChanged(bool displayTimeline)
+    {
+        if (displayTimeline)
+        {
+            _title = "Your timeline";
+            await LoadTimelineAsync();
+        }
+        else
+        {
+            _title = "Recent stories";
+            await LoadRecentStoriesAsync();
+        }
+
+        StateHasChanged();
+    }
+
+}

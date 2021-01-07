@@ -1,0 +1,67 @@
+@using Trill.Web.Core.Shared.DTO
+@using Trill.Web.Core.Stories
+@using Trill.Web.UI.Services
+@inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationService
+@inject IStoriesService StoriesService
+@inject IApiResponseHandler ApiResponseHandler
+
+<Title Level="3">Story: @Model.Title</Title>
+
+<div style="background:#fff; padding-top:30px">
+    <Card Bordered="true" Style="@(Model.Visibility.Highlighted ? "border-color: lightskyblue; width: 95%" : "width: 95%")">
+        <Body>
+        <p>@Model.Text</p>
+        <hr/>
+        <Paragraph>Sent by: <a href="@($"/search?query={Model.Author.Name}")">@Model.Author.Name</a> at @Model.CreatedAt.ToString("g"), rating: @Model.TotalRate</Paragraph>
+        @foreach (var tag in Model.Tags)
+        {
+            <Tag>
+                <a href="@($"/search?query={tag}")">@tag</a>
+            </Tag>
+        }
+        @if (AuthenticationService.User is {})
+        {
+            <br/>
+            <br/>
+            if (Model.UserRate > 0)
+            {
+                <Icon Type="like" Theme="fill" Style="font-size: 20px; margin: 5px" OnClick="RemoveRateAsync"/>
+                <Icon Type="dislike" Theme="outline" Style="font-size: 20px; margin: 5px" OnClick="DislikeAsync"/>
+            }
+            else if (Model.UserRate < 0)
+            {
+                <Icon Type="like" Theme="outline" Style="font-size: 20px; margin: 5px" OnClick="LikeAsync"/>
+                <Icon Type="dislike" Theme="fill" Style="font-size: 20px; margin: 5px" OnClick="RemoveRateAsync"/>
+            }
+            else
+            {
+                <Icon Type="like" Theme="outline" Style="font-size: 20px; margin: 5px" OnClick="LikeAsync"/>
+                <Icon Type="dislike" Theme="outline" Style="font-size: 20px; margin: 5px" OnClick="DislikeAsync"/>
+            }
+        }
+        </Body>
+    </Card>
+</div>
+
+@code {
+
+    [Parameter]
+    public StoryDetailsDto Model { get; set; }
+
+    private Task LikeAsync() => RateAsync(1);
+    private Task DislikeAsync() => RateAsync(-1);
+    private Task RemoveRateAsync() => RateAsync(0);
+
+    private async Task RateAsync(int rate)
+    {
+        var response = await ApiResponseHandler.HandleAsync(StoriesService.RateAsync(Model.Id, rate));
+        if (response.Succeeded)
+        {
+            Model.TotalRate = Model.TotalRate + rate + (Model.UserRate > 0 ? -1 : Model.UserRate < 0 ? 1 : 0);
+            Model.UserRate = rate;
+            StateHasChanged();
+        }
+    }
+
+}

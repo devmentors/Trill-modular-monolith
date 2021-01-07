@@ -1,0 +1,32 @@
+@using Trill.Web.Core.Shared.DTO
+@using Trill.Web.Core.Users
+@using Trill.Web.Core.Ads.DTO
+@using Trill.Web.UI.Services
+@inject IUsersService UsersService
+@inject IAuthenticationService AuthenticationService
+@inject MessageService MessageService
+
+<div style="background:#fff; padding-top:30px">
+    <Card Bordered="true" Style="width: 95%">
+        <Body>
+        <Title Level="4">@Model.Header</Title>
+        <Paragraph>Created at @Model.CreatedAt.ToString("g")
+            <Button Size="@("small")" Type="primary" Style="float: right">
+                <a href="@($"/ads/{Model.Id:N}")">Details</a>
+            </Button>
+        </Paragraph>
+
+        @foreach (var tag in Model.Tags)
+        {
+            <Tag>
+                <a href="@($"/search?query={tag}")">@tag</a>
+            </Tag>
+        }
+        </Body>
+    </Card>
+</div>
+
+@code {
+    [Parameter]
+    public AdDto Model { get; set; }
+}

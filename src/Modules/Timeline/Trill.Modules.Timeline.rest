@@ -1,0 +1,8 @@
+@url = http://localhost:5000/timeline-module
+@userId = 366a9635-3154-46f9-88e3-bc5fd0ce426c
+
+###
+GET {{url}}
+
+###
+GET {{url}}/timelines/{{userId}}

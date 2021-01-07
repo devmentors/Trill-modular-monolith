@@ -1,0 +1,39 @@
+﻿@page "/ads/{adId:guid}"
+@using Trill.Web.Core.Analytics
+@using Trill.Web.Core.Ads
+@using Trill.Web.Core.Ads.DTO
+@using Trill.Web.UI.Services
+@inject MessageService MessageService
+@inject IAdsService AdsService
+@inject IAnalyticsService AnalyticsService
+@inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationService
+@inject IApiResponseHandler ApiResponseHandler
+
+@if (_ad is {})
+{
+    <AdFull Model="_ad"></AdFull>
+}
+else if (_loading)
+{
+    <p>loading...</p>
+}
+else
+{
+<Title Level="3">Ad was not found</Title>
+}
+
+
+@code {
+    [Parameter]
+    public Guid AdId { get; set; }
+
+    bool _loading = true;
+    private AdDetailsDto _ad;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _ad = await ApiResponseHandler.HandleAsync(AdsService.GetAsync(AdId));
+        _loading = false;
+    }
+}

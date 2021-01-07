@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Bootstrapper\Trill.Shared.Bootstrapper.csproj" />
+    <ProjectReference Include="..\Trill.Modules.Timeline.Core\Trill.Modules.Timeline.Core.csproj" />
+  </ItemGroup>
+
+</Project>

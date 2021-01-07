@@ -1,0 +1,29 @@
+@using Trill.Web.Core.Shared.DTO
+@using Trill.Web.Core.Stories
+@using Trill.Web.UI.Services
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+@inject IStoriesService StoriesService
+
+<div style="background:#fff; padding-top:30px">
+    <Card Bordered="true" Title="@Model.Title" Style="@(Model.Visibility?.Highlighted is true ? "border-color: lightskyblue; width: 95%" : "width: 95%")">
+        <Body>
+        <Paragraph>Sent by: <a href="@($"/search?query={Model.Author.Name}")">@Model.Author.Name</a> at @Model.CreatedAt.ToString("g"), rating: @Model.TotalRate
+            <Button Size="@("small")" Type="primary" Style="float: right">
+                <a href="@($"/stories/{Model.Id}")">Details</a>
+            </Button>
+        </Paragraph>
+        @foreach (var tag in Model.Tags)
+        {
+            <Tag>
+                <a href="@($"/search?query={tag}")">@tag</a>
+            </Tag>
+        }
+        </Body>
+    </Card>
+</div>
+
+@code {
+    [Parameter]
+    public StoryDto Model { get; set; }
+}

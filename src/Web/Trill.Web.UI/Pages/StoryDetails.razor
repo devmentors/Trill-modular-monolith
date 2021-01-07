@@ -1,0 +1,39 @@
+﻿@page "/stories/{storyId:long}"
+@using Trill.Web.Core.Stories
+@using Trill.Web.Core.Analytics
+@using Trill.Web.Core.Shared.DTO
+@using Trill.Web.UI.Services
+@inject MessageService MessageService
+@inject IStoriesService StoriesService
+@inject IAnalyticsService AnalyticsService
+@inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationService
+@inject IApiResponseHandler ApiResponseHandler
+
+@if (_story is {})
+{
+    <StoryFull Model="_story"></StoryFull>
+}
+else if (_loading)
+{
+    <p>loading...</p>
+}
+else
+{
+<Title Level="3">Story was not found</Title>
+}
+
+
+@code {
+    [Parameter]
+    public long StoryId { get; set; }
+
+    bool _loading = true;
+    private StoryDetailsDto _story;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _story = await ApiResponseHandler.HandleAsync(StoriesService.GetAsync(StoryId, AuthenticationService.User?.Id));
+        _loading = false;
+    }
+}

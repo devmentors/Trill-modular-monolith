@@ -1,0 +1,24 @@
+@url = http://localhost:5000
+@adsModule = {{url}}/ads-module
+@analyticsModule = {{url}}/analytics-module
+@storiesModule = {{url}}/stories-module
+@timelineModule = {{url}}/timeline-module
+@usersModule = {{url}}/users-module
+
+###
+GET {{url}}
+
+###
+GET {{adsModule}}
+
+###
+GET {{analyticsModule}}
+
+###
+GET {{storiesModule}}
+
+###
+GET {{timelineModule}}
+
+###
+GET {{usersModule}}

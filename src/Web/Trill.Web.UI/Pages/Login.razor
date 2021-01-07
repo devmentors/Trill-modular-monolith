@@ -1,0 +1,64 @@
+﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using Trill.Web.UI.Services
+@inject MessageService MessageService;
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+
+<Title Level="3">Login</Title>
+
+<Row>
+    <Col Span="12">
+        <Form Loading="_loading" Model="@_loginModel" Style="padding-top: 50px"
+              LabelCol="new ColLayoutParam {Span = 8}"
+              WrapperCol="new ColLayoutParam {Span = 16}">
+            <FormItem Label="Name" >
+                <Input @bind-Value="@context.Name"/>
+            </FormItem>
+            <FormItem Label="Password">
+                <InputPassword @bind-Value="@context.Password"/>
+            </FormItem>
+            <FormItem WrapperCol="new ColLayoutParam {Offset = 8, Span = 16}">
+                <Button Type="@ButtonType.Primary" OnClick="LoginAsync">
+                    Login
+                </Button>
+            </FormItem>
+        </Form>
+        <Text Style="padding: 50px">Don't have an account yet? Click <a href="/register">here</a> to register.</Text>
+    </Col>
+</Row>
+
+@code
+{
+    private class LoginModel
+    {
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public string Password { get; set; }
+    }
+
+    private bool _loading;
+    private readonly LoginModel _loginModel = new LoginModel();
+
+    private async Task LoginAsync()
+    {
+        _loading = true;
+        var loggedIn = await AuthenticationService.LoginAsync(_loginModel.Name, _loginModel.Password);
+        _loading = false;
+        if (loggedIn is null)
+        {
+            await MessageService.Error("Couldn't sign in - service is unavailable :(", 1);
+            return;
+        }
+        if (loggedIn.Value)
+        {
+            await MessageService.Success("Signed in.", 1);
+            NavigationManager.NavigateTo("account");
+        }
+        else
+        {
+            await MessageService.Error("Invalid credentials.", 1);
+        }
+    }
+}

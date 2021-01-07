@@ -1,0 +1,54 @@
+﻿@page "/ads"
+@using Microsoft.AspNetCore.Authorization
+@using Trill.Web.Core
+@using Trill.Web.Core.Ads
+@using Trill.Web.Core.Ads.DTO
+@using Trill.Web.UI.Services
+@inject MessageService MessageService
+@inject IAdsService AdsService
+@inject IAuthenticationService AuthenticationService
+@inject IApiResponseHandler ApiResponseHandler
+@attribute [Authorize]
+
+<Title Level="3">Ads</Title>
+
+<Button Type="primary">
+    <a href="/ads/create">Create Ad</a>
+</Button>
+
+@if (_ads is {})
+{
+    if (_ads.Empty)
+    {
+        if (_isAdmin)
+        {
+            <Title Level="4">Users don't have ads yet.</Title>
+        }
+        else
+        {
+            <Title Level="4">You don't have ads yet.</Title>
+        }
+    }
+    foreach (var ad in _ads.Items)
+    {
+        <Ad Model="ad"></Ad>
+    }
+}
+
+@code{
+    private PagedDto<AdDto> _ads;
+    private bool _isAdmin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isAdmin = AuthenticationService.User.IsAdmin;
+        var userId = _isAdmin ? (Guid?) null : AuthenticationService.User.Id;
+        await MessageService.Loading("Fetching ads...", 1);
+        _ads = await ApiResponseHandler.HandleAsync(AdsService.BrowseAsync(userId));
+        if (_ads is null)
+        {
+            await MessageService.Error("Couldn't load the ads :(", 1);
+        }
+    }
+
+}

@@ -1,0 +1,104 @@
+@url = http://localhost:5000/users-module
+@accessToken = secret
+@refreshToken = secret
+@email = trill-user1@mailinator.com
+@name = user1
+@userId = 366a9635-3154-46f9-88e3-bc5fd0ce426c
+@followeeId = 58000442-c951-4dbe-9e76-0b2ccd2d6d3d
+
+###
+POST {{url}}/sign-up
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "name": "{{name}}",
+  "password": "secret",
+  "role": "user"
+}
+
+###
+POST {{url}}/sign-in
+Content-Type: application/json
+
+{
+  "name": "{{name}}",
+  "password": "secret"
+}
+
+###
+GET {{url}}/users
+
+###
+GET {{url}}/users/{{userId}}
+
+###
+POST {{url}}/users/{{userId}}/following/{{followeeId}}
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "followeeId": "{{followeeId}}"
+}
+
+###
+DELETE {{url}}/users/{{userId}}/following/{{followeeId}}
+
+###
+PUT {{url}}/users/{{userId}}/lock
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}"
+}
+
+###
+PUT {{url}}/users/{{userId}}/unlock
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}"
+}
+
+###
+POST {{url}}/users/{{userId}}/funds
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "amount": 1000
+}
+
+
+###
+POST {{url}}/users/{{userId}}/funds/charge
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "amount": 1000
+}
+
+###
+POST {{url}}/refresh-tokens/use
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}",
+}
+
+###
+POST {{url}}/refresh-tokens/revoke
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}",
+}
+
+###
+POST {{url}}/access-tokens/revoke
+Content-Type: application/json
+
+{
+  "accessToken": "{{accessToken}}",
+}

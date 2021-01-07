@@ -1,0 +1,13 @@
+@url = http://localhost:5000/analytics-module
+
+###
+GET {{url}}
+
+###
+GET {{url}}/trending/stories
+
+###
+GET {{url}}/trending/tags
+
+###
+GET {{url}}/trending/users

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Trill.Modules.Saga</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Chronicle_" Version="3.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Bootstrapper\Trill.Shared.Bootstrapper.csproj" />
+    <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Infrastructure\Trill.Shared.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

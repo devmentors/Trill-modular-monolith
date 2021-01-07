@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Abstractions\Trill.Shared.Abstractions.csproj" />
+    <ProjectReference Include="..\Trill.Modules.Stories.Core\Trill.Modules.Stories.Core.csproj" />
+  </ItemGroup>
+
+</Project>

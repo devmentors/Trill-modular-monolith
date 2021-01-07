@@ -1,0 +1,132 @@
+﻿@page "/ads/create"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authorization
+@using Trill.Web.Core.Ads
+@using Trill.Web.Core.Ads.Requests
+@using Trill.Web.UI.Services
+@inject MessageService MessageService
+@inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationService
+@inject IAdsService AdsService
+@inject IApiResponseHandler ApiResponseHandler
+@attribute [Authorize]
+
+<Title Level="3">Create Ad</Title>
+
+<div style="margin-left: 100px; padding-top: 50px">
+    <strong>Amount: @Amount.ToString("C") (@TotalDays days)</strong>
+</div>
+
+<Form Loading="_formLoading" Model="@_createAdModel" Style="padding-top: 50px;"
+      LabelCol="new ColLayoutParam {Span = 2}"
+      WrapperCol="new ColLayoutParam {Span = 10}"
+      OnFinish="OnFinishAsync">
+    <FormItem Label="From">
+            <DatePicker TValue="DateTime" @bind-Value="From" OnChange="OnChangeFrom" DisabledDate="date => date <= DateTime.UtcNow"/>
+    </FormItem>
+    <FormItem Label="To">
+            <DatePicker TValue="DateTime" @bind-Value="To" OnChange="OnChangeTo" DisabledDate="date => date <= DateTime.UtcNow.AddDays(1)"/>
+    </FormItem>
+    <FormItem Label="Header">
+        <Input @bind-Value="@context.Header"/>
+    </FormItem>
+    <FormItem Label="Content">
+        <TextArea style="height: 200px" @bind-Value="@context.Content"/>
+    </FormItem>
+    <FormItem Label="Tags">
+        <Input placeholder="Comma separated tags" @bind-Value="@context.Tags"/>
+    </FormItem>
+    <FormItem WrapperCol="new ColLayoutParam {Offset = 11, Span = 3}">
+        <Button HtmlType="submit" Type="primary" Loading="@_loading">
+            Send
+        </Button>
+    </FormItem>
+</Form>
+
+
+
+@code {
+
+    private class CreateAdModel
+    {
+        [Required]
+        [MinLength(3)]
+        [MaxLength(100)]
+        public string Header { get; set; }
+
+        [Required]
+        [MinLength(10)]
+        [MaxLength(1000)]
+        public string Content { get; set; }
+
+        [Required]
+        [MinLength(3)]
+        [MaxLength(100)]
+        public string Tags { get; set; }
+    }
+    
+    private bool _loading;
+    private bool _formLoading;
+    private readonly CreateAdModel _createAdModel = new CreateAdModel();
+    private decimal Amount { get; set; }
+    private DateTime From { get; set; } = DateTime.UtcNow;
+    private DateTime To { get; set; } = DateTime.UtcNow.AddDays(7);
+    private int TotalDays { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CalculateAmount();
+    }
+
+    private void CalculateAmount()
+    {
+        if (To <= From)
+        {
+            return;
+        }
+
+        TotalDays = (int)Math.Floor((To - From).TotalDays);
+        Amount = TotalDays * 100;
+        StateHasChanged();
+    }
+
+    private async Task OnFinishAsync()
+    {
+        if (To <= From)
+        {
+            await MessageService.Error("Invalid dates.", 1);
+            return;
+        }
+
+        _loading = true;
+        _formLoading = true;
+        var request = new CreateAdRequest
+        {
+            Header = _createAdModel.Header,
+            Content = _createAdModel.Content,
+            From = From,
+            To = To,
+            Tags = _createAdModel.Tags.Split(",")
+        };
+        var response = await ApiResponseHandler.HandleAsync(AdsService.CreateAsync(request));
+        _loading = false;
+        _formLoading = false;
+        if (response.Succeeded)
+        {
+            await MessageService.Info("Your ad has been sent and awaits the approval.", 1);
+            NavigationManager.NavigateTo("ads");
+        }
+    }
+
+    private void OnChangeFrom(DateTime from, string fromString)
+    {
+        From = from;
+        CalculateAmount();
+    }
+    
+    private void OnChangeTo(DateTime to, string toString)
+    {
+        To = to;
+        CalculateAmount();
+    }
+}

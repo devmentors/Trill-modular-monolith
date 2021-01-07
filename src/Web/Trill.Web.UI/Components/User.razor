@@ -1,0 +1,71 @@
+@using Trill.Web.Core.Shared.DTO
+@using Trill.Web.Core.Users
+@using Trill.Web.UI.Services
+@inject IUsersService UsersService
+@inject IAuthenticationService AuthenticationService
+@inject MessageService MessageService
+@inject IApiResponseHandler ApiResponseHandler
+
+<div style="background:#fff; padding-top:30px">
+    <Card Bordered="true" Style="width: 95%">
+        <Body>
+        <Title Level="4">
+            <a href="@($"/search?query={Model.Name}")">@Model.Name</a>
+        </Title>
+        @if (Model.StoriesCount.HasValue)
+        {
+            <p>Stories: @Model.StoriesCount</p>
+        }
+        @if (Model.FollowersCount.HasValue)
+        {
+            <p>Followers: @Model.FollowersCount</p>
+        }
+        @if (Model.FollowingCount.HasValue)
+        {
+            <p>Following: @Model.FollowingCount</p>
+        }
+        @if (AuthenticationService.User is {} && AuthenticationService.User.Id != Model.Id && Model.IsFollowing.HasValue)
+        {
+            if (Model.IsFollowing.Value)
+            {
+                <Button Type="primary" Icon="minus" OnClick="@UnfollowAsync">
+                    Unfollow
+                </Button>
+            }
+            else
+            {
+                <Button Type="primary" Icon="plus" OnClick="@FollowAsync">
+                    Follow
+                </Button>
+            }
+        }
+        </Body>
+    </Card>
+</div>
+
+@code {
+    [Parameter]
+    public UserDto Model { get; set; }
+
+    private async Task FollowAsync()
+    {
+        var response = await ApiResponseHandler.HandleAsync(UsersService.FollowAsync(AuthenticationService.User.Id, Model.Id));
+        if (response.Succeeded)
+        {
+            Model.IsFollowing = true;
+            StateHasChanged();
+            await MessageService.Success($"You've started following: {Model.Name}", 1);
+        }
+    }
+
+    private async Task UnfollowAsync()
+    {
+        var response = await ApiResponseHandler.HandleAsync(UsersService.UnfollowAsync(AuthenticationService.User.Id, Model.Id));
+        if (response.Succeeded)
+        {
+            Model.IsFollowing = false;
+            StateHasChanged();
+            await MessageService.Info($"You've stopped following: {Model.Name}", 1);
+        }
+    }
+}

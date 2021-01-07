@@ -1,0 +1,38 @@
+﻿@page "/users"
+@using Trill.Web.Core.Users
+@using Trill.Web.Core.Shared.DTO
+@using Trill.Web.Core
+@using Trill.Web.UI.Services
+@inject IAuthenticationService AuthenticationService;
+@inject IUsersService UsersService;
+@inject IApiResponseHandler ApiResponseHandler
+@inject MessageService MessageService
+
+<Title Level="3">Users</Title>
+
+@if (_users is {})
+{
+    if (_users.Empty)
+    {
+        <Title Level="4">There are no users yet.</Title>
+    }
+    foreach (var user in _users.Items)
+    {
+        <User Model="user"></User>
+    }
+}
+
+@code{
+    private PagedDto<UserDto> _users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await ApiResponseHandler.HandleAsync(UsersService.BrowseUsersAsync(AuthenticationService?.User?.Id));
+        await MessageService.Loading("Fetching the users...", 1);
+        if (_users is null)
+        {
+            await MessageService.Error("Couldn't load the users :(", 1);
+        }
+    }
+
+}

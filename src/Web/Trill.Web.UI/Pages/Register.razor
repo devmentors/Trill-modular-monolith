@@ -1,0 +1,91 @@
+﻿@page "/register"
+@using System.ComponentModel.DataAnnotations
+@using System.Net
+@using Trill.Web.Core.Users
+@using Trill.Web.Core.Users.Requests
+@using Trill.Web.UI.Services
+@inject MessageService MessageService
+@inject IUsersService UsersService
+@inject IApiResponseHandler ApiResponseHandler
+
+<Title Level="3">Register</Title>
+
+<Row>
+    <Col Span="12">
+        <Form Loading="_loading" Model="@_registerModel" Style="padding-top: 50px"
+              LabelCol="new ColLayoutParam {Span = 8}"
+              WrapperCol="new ColLayoutParam {Span = 16}"
+              OnFinish="RegisterAsync">
+            <FormItem Label="Email" >
+                <Input @bind-Value="@context.Email"/>
+            </FormItem>
+            <FormItem Label="Name">
+                <Input @bind-Value="@context.Name"/>
+            </FormItem>
+            <FormItem Label="Password">
+                <InputPassword @bind-Value="@context.Password"/>
+            </FormItem>
+            <FormItem Label="Role"> 
+                <Select DefaultValue=@("user") Style="width:200px" @bind-Value="@context.Role">
+                    <SelectOption Value="user">User</SelectOption>
+                    <SelectOption Value="admin">Admin</SelectOption>
+                </Select>
+            </FormItem>
+            <FormItem WrapperCol="new ColLayoutParam {Offset = 8, Span = 16}">
+                <Button Type="@ButtonType.Primary" HtmlType="submit">
+                    Register
+                </Button>
+            </FormItem>
+        </Form>
+        <Text Style="padding: 50px">Already have an account? Click <a href="/login">here</a> to login.</Text>
+    </Col>
+</Row>
+
+@code
+{
+    private class RegisterModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+
+        [Required]
+        public string Role { get; set; }
+    }
+
+    private bool _loading;
+    private readonly RegisterModel _registerModel = new RegisterModel();
+
+    private async Task RegisterAsync()
+    {
+        _loading = true;
+        var response = await ApiResponseHandler.HandleAsync(UsersService.RegisterAsync(new RegisterRequest
+        {
+            Email = _registerModel.Email,
+            Name = _registerModel.Name,
+            Password = _registerModel.Password,
+            Role = _registerModel.Role
+        }));
+        _loading = false;
+
+        if (response is null || response.HttpResponse.StatusCode == HttpStatusCode.BadGateway)
+        {
+            await MessageService.Error("Couldn't register - service is unavailable :(", 1);
+            return;
+        }
+
+        if (response.Succeeded)
+        {
+            _registerModel.Email = default;
+            _registerModel.Name = default;
+            _registerModel.Password = default;
+            await MessageService.Success("Account has been created.", 1);
+        }
+    }
+}

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\Ads\src\Trill.Modules.Ads.Api\Trill.Modules.Ads.Api.csproj" />
+    <ProjectReference Include="..\..\Modules\Analytics\src\Trill.Modules.Analytics.Api\Trill.Modules.Analytics.Api.csproj" />
+    <ProjectReference Include="..\..\Modules\Saga\src\Trill.Modules.Saga\Trill.Modules.Saga.csproj" />
+    <ProjectReference Include="..\..\Modules\Stories\src\Trill.Modules.Stories.Api\Trill.Modules.Stories.Api.csproj" />
+    <ProjectReference Include="..\..\Modules\Timeline\src\Trill.Modules.Timeline.Api\Trill.Modules.Timeline.Api.csproj" />
+    <ProjectReference Include="..\..\Modules\Users\src\Trill.Modules.Users.Api\Trill.Modules.Users.Api.csproj" />
+    <ProjectReference Include="..\..\Shared\Trill.Shared.Infrastructure\Trill.Shared.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="certs\**" CopyToPublishDirectory="Always" />
+  </ItemGroup>
+
+</Project>

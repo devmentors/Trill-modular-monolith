@@ -1,0 +1,57 @@
+﻿@page "/search"
+@using Trill.Web.Core
+@using Trill.Web.Core.Shared.DTO
+@using Trill.Web.Core.Stories
+@using Trill.Web.UI.Services
+@inject MessageService MessageService;
+@inject IStoriesService StoriesService;
+@inject NavigationManager NavigationManager;
+@inject IAuthenticationService AuthenticationService;
+@inject IApiResponseHandler ApiResponseHandler
+
+@if (_results is {})
+{
+    if (_results.Empty)
+    {
+        <Title Level="3">No stories have been found for query: @Query</Title>
+    }
+    else
+    {
+        <Title Level="3">Found stories: @_results.TotalResults for query: @Query</Title>
+        foreach (var story in _results.Items)
+        {
+            <Story Model="@story" />
+        }
+    }
+    
+}
+
+@code{
+
+    private PagedDto<StoryDto> _results;
+    private string Query { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (uri.Query.Contains("?") && uri.Query.Contains("="))
+        {
+            var parts = uri.Query.Split("?").Last().Split("=");
+            Query = parts[1];
+            StateHasChanged();
+            await OnSearch();
+        }
+    }
+    
+    private async Task OnSearch()
+    {
+        if (string.IsNullOrWhiteSpace(Query))
+        {
+            return;
+        }
+        
+        NavigationManager.NavigateTo($"search?query={Query}");
+        _results = await ApiResponseHandler.HandleAsync(StoriesService.BrowseAsync(Query, AuthenticationService.User?.Id));
+        MessageService.Destroy();
+    }
+}

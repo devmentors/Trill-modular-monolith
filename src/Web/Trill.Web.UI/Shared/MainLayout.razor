@@ -1,0 +1,70 @@
+﻿@using Trill.Web.Core.Stories
+@using Trill.Web.UI.Services
+@inherits LayoutComponentBase
+@inject MessageService MessageService;
+@inject IStoriesService StoriesService;
+@inject NavigationManager NavigationManager;
+@inject IAuthenticationService AuthenticationService;
+
+@{
+    var isAuthenticated = AuthenticationService.User is {};
+}
+
+<Layout>
+    <Content Style="padding: 0 50px">
+        <Layout Class="site-layout-background" Style="padding: 24px 0;">
+            <Sider Class="site-layout-background" Width="300">
+                <Menu Theme="MenuTheme.Light" Mode="MenuMode.Inline" OnMenuItemClicked="OnMenuClick" DefaultSelectedKeys=@(new[] {"1"})>
+                    <MenuItem Key="1" RouterLink="/">
+                        <Icon Type="container" Theme="outline"/>
+                        <span class="nav-text">Stories</span>
+                    </MenuItem>
+                    <MenuItem Key="2" RouterLink="/trending">
+                        <Icon Type="line-chart" Theme="outline"/>
+                        <span class="nav-text">Trending</span>
+                    </MenuItem>
+                    <MenuItem Key="3" RouterLink="/users">
+                        <Icon Type="team" Theme="outline"/>
+                        <span class="nav-text">Users</span>
+                    </MenuItem>
+                    @if (isAuthenticated)
+                    {
+                        <MenuItem Key="4" RouterLink="/ads">
+                        <Icon Type="dollar-circle" Theme="outline"/>
+                        <span class="nav-text">Ads</span>
+                        </MenuItem>
+                        
+                        <MenuItem Key="5" RouterLink="/account">
+                        <Icon Type="user" Theme="outline"/>
+                        <span class="nav-text">Account</span>
+                        </MenuItem>
+                    }
+                    else
+                    {
+                        <MenuItem Key="4" RouterLink="/login">
+                        <Icon Type="login" Theme="outline"/>
+                        <span class="nav-text">Login</span>
+                        </MenuItem>
+                    }
+                </Menu>
+            </Sider>
+            <Content Style="padding:0 24px; min-height: 960px;">
+                @Body
+            </Content>
+        </Layout>
+    </Content>
+</Layout>
+
+@code {
+
+    private void OnMenuClick(MenuItem menuItem)
+    {
+        NavigationManager.NavigateTo(menuItem.RouterLink);
+    }
+}
+
+<style>
+    .site-layout-background {
+        background: #fff;
+    }
+</style>

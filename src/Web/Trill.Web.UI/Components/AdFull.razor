@@ -1,0 +1,95 @@
+@using Trill.Web.Core.Shared.DTO
+@using Trill.Web.Core.Users
+@using Trill.Web.Core.Ads.DTO
+@using Microsoft.AspNetCore.Authorization
+@using Trill.Web.Core.Ads
+@using Trill.Web.UI.Services
+@inject IAdsService AdsService
+@inject IAuthenticationService AuthenticationService
+@inject MessageService MessageService
+@inject IApiResponseHandler ApiResponseHandler
+@attribute [Authorize]
+
+<Title Level="3">Ad: @Model.Header</Title>
+
+<div style="background:#fff; padding-top:30px">
+    <Card Bordered="true" Style="width: 95%">
+        <Body>
+        <p>@Model.Content</p>
+        <hr/>
+        <Paragraph>Created at @Model.CreatedAt.ToString("g"), period: @Model.From.ToString("d") - @Model.To.ToString("d"), amount: @Model.Amount.ToString("C")
+        </Paragraph>
+        @foreach (var tag in Model.Tags)
+        {
+            <Tag>
+                <a href="@($"/search?query={tag}")">@tag</a>
+            </Tag>
+        }
+        <br/>
+        <br/>
+        <div>
+            <Steps Current="@_progressStep" Class="site-navigation-steps">
+                <Step Title="@("Draft")" Description="@("Draft was saved")" />
+                <Step Title="@("Approval")" Description="@("Ad was approved")" />
+                <Step Title="@("Payment")" Description="@("Payment succeeded")" />
+                <Step Title="@("Activation")" Description="@("Ad was published")" />
+            </Steps>
+        </div>
+        <br/>
+        <br/>
+        @if (Model.State == "rejected")
+        {
+            <Title Level="4">Ad has been rejected.</Title>
+        }
+        @if (Model.State == "new" && AuthenticationService.User.IsAdmin)
+        {
+            <Popconfirm Title="@("Are you sure?")" OnConfirm="ApproveAsync">
+                <Button Type="primary">
+                    Approve
+                </Button>
+            </Popconfirm>
+            <Popconfirm Title="@("Are you sure?")" OnConfirm="RejectAsync">
+                <Button Type="danger">
+                    Reject
+                </Button>
+            </Popconfirm>
+        }
+        </Body>
+    </Card>
+</div>
+
+@code {
+    [Parameter]
+    public AdDetailsDto Model { get; set; }
+
+    private int _progressStep = 1;
+
+    protected override void OnParametersSet()
+    {
+        _progressStep = Model.PublishedAt.HasValue ? 3 : Model.PaidAt.HasValue ? 2 : Model.ApprovedAt.HasValue ? 1 : 0;
+    }
+
+    private async Task ApproveAsync()
+    {
+        var response = await ApiResponseHandler.HandleAsync(AdsService.ApproveAsync(Model.Id));
+        if (response.Succeeded)
+        {
+            Model.State = "approved";
+            Model.ApprovedAt = DateTime.UtcNow;
+            _progressStep = 1;
+            StateHasChanged();
+            await MessageService.Success("Ad has been approved, processing the payment...");
+        }
+    }
+
+    private async Task RejectAsync()
+    {
+        var response = await ApiResponseHandler.HandleAsync(AdsService.RejectAsync(Model.Id));
+        if (response.Succeeded)
+        {
+            Model.State = "rejected";
+            StateHasChanged();
+            await MessageService.Info("Ad has been rejected.");
+        }
+    }
+}

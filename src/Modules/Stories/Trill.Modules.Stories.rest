@@ -1,0 +1,36 @@
+@url = http://localhost:5000/stories-module
+@storyId = 1234567890
+@userId = b7768065-835a-4002-9260-63c99b93bd88
+
+###
+GET {{url}}
+
+###
+GET {{url}}/stories
+
+###
+GET {{url}}/stories/{{storyId}}
+
+###
+POST {{url}}/stories
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "title": "Test 1",
+  "text": "Lorem ipsum text",
+  "tags": ["dotnet", "csharp"],
+  "visibleFrom": null,
+  "visibleTo": null,
+  "highlighted": false
+}
+
+###
+POST {{url}}/stories/{{storyId}}/rate
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "storyId": "{{storyId}}",
+  "rate": 1
+}
