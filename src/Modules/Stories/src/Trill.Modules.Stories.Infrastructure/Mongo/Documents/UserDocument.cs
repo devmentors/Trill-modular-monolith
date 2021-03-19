@@ -9,6 +9,7 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Documents
         public Guid Id { get; set; }
         public string Name { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int Rating { get; set; }
         public bool Locked { get; set; }
 
         public UserDocument()
@@ -20,9 +21,10 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Documents
             Id = user.Id;
             Name = user.Name;
             CreatedAt = user.CreatedAt;
+            Rating = user.Rating;
             Locked = user.Locked;
         }
 
-        public User ToEntity() => new User(Id, Name, CreatedAt, Locked);
+        public User ToEntity() => new User(Id, Name, CreatedAt, Rating, Locked);
     }
 }

@@ -1,0 +1,8 @@
+﻿{
+  "analytics" : {
+    "module" : {
+      "name" : "Analytics",
+      "enabled" : true
+    }
+  }
+}

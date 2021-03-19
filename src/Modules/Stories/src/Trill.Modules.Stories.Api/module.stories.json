@@ -1,0 +1,8 @@
+﻿{
+  "stories" : {
+    "module" : {
+      "name" : "Stories",
+      "enabled" : true
+    }
+  }
+}

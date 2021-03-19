@@ -10,8 +10,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Bootstrapper\Trill.Shared.Bootstrapper.csproj" />
     <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Infrastructure\Trill.Shared.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="module.saga.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

@@ -8,21 +8,15 @@ namespace Trill.Shared.Infrastructure.Events
 {
     internal static class Extensions
     {
-        public static IServiceCollection AddEventHandlers(this IServiceCollection services,
+        public static IServiceCollection AddEvents(this IServiceCollection services,
             IEnumerable<Assembly> assemblies)
         {
+            services.AddSingleton<IEventDispatcher, EventDispatcher>();
             services.Scan(s => s.FromAssemblies(assemblies)
                 .AddClasses(c => c.AssignableTo(typeof(IEventHandler<>))
                     .WithoutAttribute(typeof(DecoratorAttribute)))
                 .AsImplementedInterfaces()
                 .WithScopedLifetime());
-
-            return services;
-        }
-
-        public static IServiceCollection AddInMemoryEventDispatcher(this IServiceCollection services)
-        {
-            services.AddSingleton<IEventDispatcher, EventDispatcher>();
 
             return services;
         }

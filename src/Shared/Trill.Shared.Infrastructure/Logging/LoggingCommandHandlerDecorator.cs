@@ -10,10 +10,10 @@ namespace Trill.Shared.Infrastructure.Logging
     internal sealed class LoggingCommandHandlerDecorator<T> : ICommandHandler<T> where T : class, ICommand
     {
         private readonly ICommandHandler<T> _handler;
-        private readonly ILogger<ICommandHandler<T>> _logger;
+        private readonly ILogger<LoggingCommandHandlerDecorator<T>> _logger;
 
         public LoggingCommandHandlerDecorator(ICommandHandler<T> handler,
-            ILogger<ICommandHandler<T>> logger)
+            ILogger<LoggingCommandHandlerDecorator<T>> logger)
         {
             _handler = handler;
             _logger = logger;

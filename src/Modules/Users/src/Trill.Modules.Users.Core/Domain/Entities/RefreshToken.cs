@@ -1,6 +1,6 @@
 using System;
 using Trill.Modules.Users.Core.Domain.Exceptions;
-using Trill.Shared.Kernel.BuildingBlocks;
+using Trill.Shared.Abstractions.Kernel;
 
 namespace Trill.Modules.Users.Core.Domain.Entities
 {

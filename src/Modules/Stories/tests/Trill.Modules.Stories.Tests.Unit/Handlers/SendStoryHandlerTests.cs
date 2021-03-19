@@ -8,12 +8,15 @@ using Trill.Modules.Stories.Application.Events;
 using Trill.Modules.Stories.Application.Exceptions;
 using Trill.Modules.Stories.Application.Services;
 using Trill.Modules.Stories.Core.Entities;
+using Trill.Modules.Stories.Core.Exceptions;
+using Trill.Modules.Stories.Core.Factories;
 using Trill.Modules.Stories.Core.Policies;
 using Trill.Modules.Stories.Core.Repositories;
-using Trill.Shared.Abstractions;
 using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Generators;
+using Trill.Shared.Abstractions.Kernel;
 using Trill.Shared.Abstractions.Messaging;
+using Trill.Shared.Abstractions.Time;
 using Xunit;
 
 namespace Trill.Modules.Stories.Tests.Unit.Handlers
@@ -30,9 +33,9 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
             
             await Act(command);
             
-            _storyTextPolicy.Received(1).Verify(command.Text);
+            _storyTextFactory.Received(1).Create(command.Text);
             _idGenerator.Received(1).Generate();
-            _dateTimeProvider.Received(1).Get();
+            _clock.Received(1).Current();
             _storyRequestStorage.Received(1).SetStoryId(command.Id, Arg.Any<long>());
             await _storyRepository.Received(1).AddAsync(Arg.Is<Story>(x => x.Title == command.Title));
         }
@@ -62,7 +65,7 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
         [Fact]
         public async Task handler_should_fail_given_locked_user()
         {
-            var user = SetupUser(true);
+            var user = SetupUser(0, true);
             var command = CreateCommand(user.Id);
             
             var exception = await Record.ExceptionAsync(() => Act(command));
@@ -75,10 +78,13 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
 
         private readonly IUserRepository _userRepository;
         private readonly IStoryRepository _storyRepository;
-        private readonly IStoryTextPolicy _storyTextPolicy;
-        private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IStoryTextFactory _storyTextFactory;
+        private readonly IStoryAuthorPolicy _storyAuthorPolicy;
+        private readonly IDomainEventDispatcher _domainEventDispatcher;
+        private readonly IClock _clock;
         private readonly IIdGenerator _idGenerator;
         private readonly IStoryRequestStorage _storyRequestStorage;
+        private readonly IEventMapper _eventMapper;
         private readonly IMessageBroker _messageBroker;
         private readonly ICommandHandler<SendStory> _handler;
 
@@ -86,18 +92,21 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
         {
             _userRepository = Substitute.For<IUserRepository>();
             _storyRepository = Substitute.For<IStoryRepository>();
-            _storyTextPolicy = Substitute.For<IStoryTextPolicy>();
-            _dateTimeProvider = Substitute.For<IDateTimeProvider>();
+            _storyTextFactory = Substitute.For<IStoryTextFactory>();
+            _storyAuthorPolicy = Substitute.For<IStoryAuthorPolicy>();
+            _domainEventDispatcher = Substitute.For<IDomainEventDispatcher>();
+            _clock = Substitute.For<IClock>();
             _idGenerator = Substitute.For<IIdGenerator>();
             _storyRequestStorage = Substitute.For<IStoryRequestStorage>();
+            _eventMapper = Substitute.For<IEventMapper>();
             _messageBroker = Substitute.For<IMessageBroker>();
-            _handler = new SendStoryHandler(_userRepository, _storyRepository, _storyTextPolicy, _dateTimeProvider,
-                _idGenerator, _storyRequestStorage, _messageBroker);
+            _handler = new SendStoryHandler(_userRepository, _storyRepository, _storyTextFactory, _storyAuthorPolicy,
+                _domainEventDispatcher, _clock, _idGenerator, _storyRequestStorage, _eventMapper, _messageBroker);
         }
 
-        private User SetupUser(bool locked = false)
+        private User SetupUser(int rating = 0, bool locked = false)
         {
-            var user = new User(Guid.NewGuid(), "test", DateTime.UtcNow, locked);
+            var user = new User(Guid.NewGuid(), "test", DateTime.UtcNow, rating, locked);
             _userRepository.GetAsync(user.Id).Returns(user);
             return user;
         }

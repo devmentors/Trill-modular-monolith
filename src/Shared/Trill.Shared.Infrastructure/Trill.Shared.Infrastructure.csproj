@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Trill.Shared.Abstractions\Trill.Shared.Abstractions.csproj" />
-    <ProjectReference Include="..\Trill.Shared.Kernel\Trill.Shared.Kernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

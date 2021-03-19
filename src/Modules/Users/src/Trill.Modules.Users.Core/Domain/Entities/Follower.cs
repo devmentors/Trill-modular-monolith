@@ -1,5 +1,5 @@
 using System;
-using Trill.Shared.Kernel.BuildingBlocks;
+using Trill.Shared.Abstractions.Kernel;
 
 namespace Trill.Modules.Users.Core.Domain.Entities
 {

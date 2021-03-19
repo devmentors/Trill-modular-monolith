@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Trill.Modules.Users.Core.Domain.Exceptions;
-using Trill.Shared.Kernel.BuildingBlocks;
+using Trill.Shared.Abstractions.Kernel;
 
 namespace Trill.Modules.Users.Core.Domain.Entities
 {
@@ -40,7 +40,6 @@ namespace Trill.Modules.Users.Core.Domain.Entities
                 throw new InvalidRoleException(role);
             }
 
-            Id = id;
             Email = email.ToLowerInvariant();
             Name = name.Trim();
             Password = password;
@@ -59,13 +58,13 @@ namespace Trill.Modules.Users.Core.Domain.Entities
             }
 
             Funds -= amount;
-            Version++;
+            IncrementVersion();
         }
 
         public void AddFunds(decimal amount)
         {
             Funds += amount;
-            Version++;
+            IncrementVersion();
         }
 
         public bool Lock()

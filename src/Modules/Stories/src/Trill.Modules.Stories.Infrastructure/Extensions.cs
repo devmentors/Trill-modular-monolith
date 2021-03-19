@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Trill.Modules.Stories.Application.Clients.Users;
 using Trill.Modules.Stories.Application.Services;
-using Trill.Modules.Stories.Core.Policies;
 using Trill.Modules.Stories.Core.Repositories;
 using Trill.Modules.Stories.Infrastructure.Clients.Users;
 using Trill.Modules.Stories.Infrastructure.Mongo;
@@ -24,7 +23,6 @@ namespace Trill.Modules.Stories.Infrastructure
         internal static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
             services
-                .AddSingleton<IStoryTextPolicy, DefaultStoryTextPolicy>()
                 .AddSingleton<IStoryRequestStorage, StoryRequestStorage>()
                 .AddScoped<IUsersApiClient, UsersApiClient>()
                 .AddScoped<IStoryRepository, StoryMongoRepository>()

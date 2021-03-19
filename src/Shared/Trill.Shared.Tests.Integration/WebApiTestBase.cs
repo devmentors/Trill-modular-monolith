@@ -1,12 +1,13 @@
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Trill.Api;
+using Trill.Bootstrapper;
 using Xunit;
 
 namespace Trill.Shared.Tests.Integration
@@ -59,6 +60,12 @@ namespace Trill.Shared.Tests.Integration
 
         protected Task<HttpResponseMessage> SendAsync(HttpMethod method, string endpoint)
             => Client.SendAsync(new HttpRequestMessage(method, GetEndpoint(endpoint)));
+        
+        protected void Authenticate(Guid userId)
+        {
+            var jwt = AuthHelper.GenerateJwt(userId.ToString());
+            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+        }
 
         private static HttpMethod GetMethod(string method)
             => method.ToUpperInvariant() switch

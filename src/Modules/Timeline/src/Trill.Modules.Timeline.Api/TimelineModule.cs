@@ -5,17 +5,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Trill.Modules.Timeline.Core;
-using Trill.Shared.Bootstrapper;
-using Trill.Shared.Bootstrapper.Endpoints;
+using Trill.Shared.Infrastructure.Api;
+using Trill.Shared.Infrastructure.Modules;
 
-[assembly: InternalsVisibleTo("Trill.Api")]
+[assembly: InternalsVisibleTo("Trill.Bootstrapper")]
 namespace Trill.Modules.Timeline.Api
 {
     internal class TimelineModule : IModule
     {
         public string Name { get; } = "Timeline";
         public string Path { get; } = "timeline-module";
-        public string Schema { get; } = "timeline-module";
 
 
         public void ConfigureServices(IServiceCollection services)

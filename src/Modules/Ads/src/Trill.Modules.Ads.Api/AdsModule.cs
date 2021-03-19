@@ -6,17 +6,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Trill.Modules.Ads.Core;
 using Trill.Modules.Ads.Core.Clients.Stories.Requests;
 using Trill.Modules.Ads.Core.Clients.Users.Requests;
-using Trill.Shared.Bootstrapper;
 using Trill.Shared.Infrastructure.Modules;
 
-[assembly: InternalsVisibleTo("Trill.Api")]
+[assembly: InternalsVisibleTo("Trill.Bootstrapper")]
 namespace Trill.Modules.Ads.Api
 {
     internal class AdsModule : IModule
     {
         public string Name { get; } = "Ads";
         public string Path { get; } = "ads-module";
-        public string Schema { get; } = "ads-module";
 
         public void ConfigureServices(IServiceCollection services)
         {

@@ -3,16 +3,15 @@ using Chronicle;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Trill.Shared.Bootstrapper;
+using Trill.Shared.Infrastructure.Modules;
 
-[assembly: InternalsVisibleTo("Trill.Api")]
+[assembly: InternalsVisibleTo("Trill.Bootstrapper")]
 namespace Trill.Modules.Saga
 {
     internal class SagaModule : IModule
     {
         public string Name { get; } = "Saga";
-        public string Path { get; } = string.Empty;
-        public string Schema { get; } = string.Empty;
+        public string Path { get; } = "saga";
 
         public void ConfigureServices(IServiceCollection services)
         {

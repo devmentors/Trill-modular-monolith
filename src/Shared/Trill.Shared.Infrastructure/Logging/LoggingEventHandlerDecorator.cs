@@ -10,9 +10,9 @@ namespace Trill.Shared.Infrastructure.Logging
     internal sealed class LoggingEventHandlerDecorator<T> : IEventHandler<T> where T : class, IEvent
     {
         private readonly IEventHandler<T> _handler;
-        private readonly ILogger<IEventHandler<T>> _logger;
+        private readonly ILogger<LoggingEventHandlerDecorator<T>> _logger;
 
-        public LoggingEventHandlerDecorator(IEventHandler<T> handler, ILogger<IEventHandler<T>> logger)
+        public LoggingEventHandlerDecorator(IEventHandler<T> handler, ILogger<LoggingEventHandlerDecorator<T>> logger)
         {
             _handler = handler;
             _logger = logger;

@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trill.Modules.Stories.Core.Events;
 using Trill.Modules.Stories.Core.Exceptions;
 using Trill.Modules.Stories.Core.ValueObjects;
+using Trill.Shared.Abstractions.Kernel;
 
 namespace Trill.Modules.Stories.Core.Entities
 {
-    internal class Story
+    internal class Story : AggregateRoot<StoryId>
     {
         private ISet<string> _tags = new HashSet<string>();
-        public StoryId Id { get; }
         public Author Author { get; }
         public string Title { get; }
         public StoryText Text { get; }
@@ -24,7 +25,7 @@ namespace Trill.Modules.Stories.Core.Entities
         public DateTime CreatedAt { get; }
 
         public Story(StoryId id, Author author, string title, StoryText text, IEnumerable<string> tags,
-            DateTime createdAt, Visibility visibility = null)
+            DateTime createdAt, Visibility visibility = null, int version = 0) : base(id, version)
         {
             if (string.IsNullOrWhiteSpace(title))
             {
@@ -33,12 +34,20 @@ namespace Trill.Modules.Stories.Core.Entities
 
             SetTags(tags);
 
-            Id = id;
             Author = author;
             Title = title;
             Text = text;
             CreatedAt = createdAt;
             Visibility = visibility;
+        }
+
+        public static Story Create(StoryId id, Author author, string title, StoryText text, IEnumerable<string> tags,
+            DateTime createdAt, Visibility visibility = null)
+        {
+            var story = new Story(id, author, title, text, tags, createdAt, visibility);
+            story.AddEvent(new StoryCreated(story));
+
+            return story;
         }
 
         public void SetTags(IEnumerable<string> tags)

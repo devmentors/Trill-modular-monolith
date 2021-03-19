@@ -5,8 +5,8 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 using Serilog.Filters;
+using Trill.Shared.Infrastructure.Api;
 using Trill.Shared.Infrastructure.Logging.Options;
-using Trill.Shared.Infrastructure.Web;
 
 namespace Trill.Shared.Infrastructure.Logging
 {

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using Trill.Shared.Abstractions;
 using Trill.Shared.Abstractions.Commands;
+using Trill.Shared.Abstractions.Dispatchers;
 using Trill.Shared.Abstractions.Events;
 using Trill.Shared.Abstractions.Queries;
 
@@ -28,8 +28,5 @@ namespace Trill.Shared.Infrastructure.Dispatchers
 
         public Task<TResult> QueryAsync<TResult>(IQuery<TResult> query)
             => _queryDispatcher.QueryAsync(query);
-
-        public Task<TResult> QueryAsync<TQuery, TResult>(TQuery query) where TQuery : class, IQuery<TResult>
-            => _queryDispatcher.QueryAsync<TQuery, TResult>(query);
     }
 }

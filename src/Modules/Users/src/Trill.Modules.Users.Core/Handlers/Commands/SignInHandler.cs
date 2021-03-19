@@ -11,8 +11,8 @@ using Trill.Modules.Users.Core.Events;
 using Trill.Modules.Users.Core.Services;
 using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Generators;
+using Trill.Shared.Abstractions.Kernel;
 using Trill.Shared.Abstractions.Messaging;
-using Trill.Shared.Kernel.BuildingBlocks;
 
 namespace Trill.Modules.Users.Core.Handlers.Commands
 {

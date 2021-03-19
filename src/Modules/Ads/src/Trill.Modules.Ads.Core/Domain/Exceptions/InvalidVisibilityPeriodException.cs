@@ -1,5 +1,5 @@
 using System;
-using Trill.Shared.Kernel.Exceptions;
+using Trill.Shared.Abstractions.Kernel;
 
 namespace Trill.Modules.Ads.Core.Domain.Exceptions
 {

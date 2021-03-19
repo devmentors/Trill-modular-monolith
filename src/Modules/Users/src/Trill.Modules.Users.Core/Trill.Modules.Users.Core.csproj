@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Infrastructure\Trill.Shared.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Kernel\Trill.Shared.Kernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

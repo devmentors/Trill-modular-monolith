@@ -5,8 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Bootstrapper\Trill.Shared.Bootstrapper.csproj" />
     <ProjectReference Include="..\Trill.Modules.Analytics.Core\Trill.Modules.Analytics.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="module.analytics.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

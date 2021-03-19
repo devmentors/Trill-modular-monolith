@@ -4,16 +4,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Trill.Modules.Analytics.Core;
-using Trill.Shared.Bootstrapper;
+using Trill.Shared.Infrastructure.Modules;
 
-[assembly: InternalsVisibleTo("Trill.Api")]
+[assembly: InternalsVisibleTo("Trill.Bootstrapper")]
 namespace Trill.Modules.Analytics.Api
 {
     internal class AnalyticsModule : IModule
     {
         public string Name { get; } = "Analytics";
         public string Path { get; } = "analytics-module";
-        public string Schema { get; } = "analytics-module";
 
         public void ConfigureServices(IServiceCollection services)
         {

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Trill.Modules.Users.Core.Domain.Entities;
-using Trill.Shared.Kernel.BuildingBlocks;
+using Trill.Shared.Abstractions.Kernel;
 
 namespace Trill.Modules.Users.Core.Domain.Repositories
 {

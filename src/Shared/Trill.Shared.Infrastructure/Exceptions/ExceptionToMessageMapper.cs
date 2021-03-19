@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Trill.Shared.Abstractions;
 using Trill.Shared.Abstractions.Events;
 using Trill.Shared.Abstractions.Exceptions;
+using Trill.Shared.Abstractions.Kernel;
 using Trill.Shared.Infrastructure.Messaging;
-using Trill.Shared.Kernel.Exceptions;
 
 namespace Trill.Shared.Infrastructure.Exceptions
 {

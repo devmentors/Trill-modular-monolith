@@ -1,0 +1,8 @@
+﻿{
+  "timeline": {
+    "module": {
+      "name": "Timeline",
+      "enabled": true
+    }
+  }
+}

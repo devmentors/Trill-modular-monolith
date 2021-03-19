@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\API\Trill.Api\Trill.Api.csproj" />
+      <ProjectReference Include="..\..\Bootstrapper\Trill.Bootstrapper\Trill.Bootstrapper.csproj" />
     </ItemGroup>
 
 </Project>

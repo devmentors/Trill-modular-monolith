@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Kernel\Trill.Shared.Kernel.csproj" />
+    <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Abstractions\Trill.Shared.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

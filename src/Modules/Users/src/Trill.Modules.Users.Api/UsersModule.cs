@@ -8,13 +8,12 @@ using Trill.Modules.Users.Core.Commands;
 using Trill.Modules.Users.Core.DTO;
 using Trill.Modules.Users.Core.Queries;
 using Trill.Modules.Users.Core.Services;
-using Trill.Shared.Abstractions;
+using Trill.Shared.Abstractions.Dispatchers;
 using Trill.Shared.Abstractions.Queries;
-using Trill.Shared.Bootstrapper;
-using Trill.Shared.Bootstrapper.Endpoints;
+using Trill.Shared.Infrastructure.Api;
 using Trill.Shared.Infrastructure.Modules;
 
-[assembly: InternalsVisibleTo("Trill.Api")]
+[assembly: InternalsVisibleTo("Trill.Bootstrapper")]
 namespace Trill.Modules.Users.Api
 {
     internal class UsersModule : IModule
@@ -52,7 +51,6 @@ namespace Trill.Modules.Users.Api
                 })
                 .Post<SignUp>($"{Path}/sign-up",
                     after: (cmd, ctx) => ctx.Response.Created($"{Path}/users/{cmd.UserId}"))
-                .Post<RevokeAccessToken>($"{Path}/access-tokens/revoke")
                 .Post<UseRefreshToken>($"{Path}/refresh-tokens/use", after: (cmd, ctx) =>
                 {
                     var jwt = ctx.RequestServices.GetRequiredService<ITokenStorage>().Get(cmd.Id);

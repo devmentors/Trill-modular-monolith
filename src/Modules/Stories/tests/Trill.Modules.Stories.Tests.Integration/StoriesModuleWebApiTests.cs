@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using Trill.Api;
+using Trill.Bootstrapper;
 using Trill.Modules.Stories.Application.Commands;
 using Trill.Modules.Stories.Application.DTO;
 using Trill.Modules.Stories.Core.Entities;

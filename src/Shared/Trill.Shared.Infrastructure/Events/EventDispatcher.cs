@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -36,31 +37,18 @@ namespace Trill.Shared.Infrastructure.Events
             {
                 var handlerType = typeof(IEventHandler<>).MakeGenericType(@event.GetType());
                 var eventHandlers = scope.ServiceProvider.GetServices(handlerType);
-                foreach (var handler in eventHandlers)
-                {
-                    if (handler is null)
-                    {
-                        continue;
-                    }
-
-                    await (Task) handler.GetType().GetMethod(nameof(IEventHandler<T>.HandleAsync))
-                        ?.Invoke(handler, new[] {@event});
-                }
+                var handlerTasks = eventHandlers.Select(x => (Task) handlerType
+                    .GetMethod(nameof(IEventHandler<IEvent>.HandleAsync))
+                    ?.Invoke(x, new[] {@event}));
                 
-                // dynamic eventHandlers = scope.ServiceProvider.GetServices(handlerType);
-                // foreach (var handler in eventHandlers)
-                // {
-                //     await (Task) handler.HandleAsync((dynamic) @event);
-                // }
-
+                await Task.WhenAll(handlerTasks);
+                
                 return;
             }
 
             var handlers = scope.ServiceProvider.GetServices<IEventHandler<T>>();
-            foreach (var handler in handlers)
-            {
-                await handler.HandleAsync(@event);
-            }
+            var tasks = handlers.Select(x => x.HandleAsync(@event));
+            await Task.WhenAll(tasks);
         }
     }
 }

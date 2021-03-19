@@ -1,4 +1,4 @@
-using Trill.Shared.Kernel.BuildingBlocks;
+using Trill.Shared.Abstractions.Kernel;
 
 namespace Trill.Modules.Stories.Core.Entities
 {

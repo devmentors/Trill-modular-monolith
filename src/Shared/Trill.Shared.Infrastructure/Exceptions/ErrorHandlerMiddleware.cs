@@ -21,13 +21,13 @@ namespace Trill.Shared.Infrastructure.Exceptions
             }
         };
 
-        private readonly IExceptionToResponseMapper _exceptionToResponseMapper;
+        private readonly IExceptionCompositionRoot _exceptionCompositionRoot;
         private readonly ILogger<ErrorHandlerMiddleware> _logger;
 
-        public ErrorHandlerMiddleware(IExceptionToResponseMapper exceptionToResponseMapper,
+        public ErrorHandlerMiddleware(IExceptionCompositionRoot exceptionCompositionRoot,
             ILogger<ErrorHandlerMiddleware> logger)
         {
-            _exceptionToResponseMapper = exceptionToResponseMapper;
+            _exceptionCompositionRoot = exceptionCompositionRoot;
             _logger = logger;
         }
 
@@ -46,7 +46,7 @@ namespace Trill.Shared.Infrastructure.Exceptions
 
         private async Task HandleErrorAsync(HttpContext context, Exception exception)
         {
-            var exceptionResponse = _exceptionToResponseMapper.Map(exception);
+            var exceptionResponse = _exceptionCompositionRoot.Map(exception);
             context.Response.StatusCode = (int) (exceptionResponse?.StatusCode ?? HttpStatusCode.InternalServerError);
             var response = exceptionResponse?.Response;
             if (response is null)

@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Trill.Modules.Users.Core.Domain.Entities;
 using Trill.Modules.Users.Core.Domain.Repositories;
 using Trill.Modules.Users.Core.Mongo.Documents;
+using Trill.Shared.Abstractions.Kernel;
 using Trill.Shared.Infrastructure.Mongo;
-using Trill.Shared.Kernel.BuildingBlocks;
 
 namespace Trill.Modules.Users.Core.Mongo.Repositories
 {

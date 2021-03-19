@@ -6,8 +6,8 @@ using Trill.Modules.Users.Core.Domain.Repositories;
 using Trill.Modules.Users.Core.Events;
 using Trill.Modules.Users.Core.Exceptions;
 using Trill.Shared.Abstractions.Commands;
+using Trill.Shared.Abstractions.Kernel;
 using Trill.Shared.Abstractions.Messaging;
-using Trill.Shared.Kernel.BuildingBlocks;
 
 namespace Trill.Modules.Users.Core.Handlers.Commands
 {

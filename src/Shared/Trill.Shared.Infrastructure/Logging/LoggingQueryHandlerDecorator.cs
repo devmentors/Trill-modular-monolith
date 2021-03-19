@@ -10,10 +10,10 @@ namespace Trill.Shared.Infrastructure.Logging
         where TQuery : class, IQuery<TResult>
     {
         private readonly IQueryHandler<TQuery, TResult> _handler;
-        private readonly ILogger<IQueryHandler<TQuery, TResult>> _logger;
+        private readonly ILogger<LoggingQueryHandlerDecorator<TQuery, TResult>> _logger;
 
         public LoggingQueryHandlerDecorator(IQueryHandler<TQuery, TResult> handler,
-            ILogger<IQueryHandler<TQuery, TResult>> logger)
+            ILogger<LoggingQueryHandlerDecorator<TQuery, TResult>> logger)
         {
             _handler = handler;
             _logger = logger;

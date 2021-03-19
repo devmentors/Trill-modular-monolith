@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Trill.Modules.Ads.Core.Commands;
 using Trill.Modules.Ads.Core.DTO;
 using Trill.Modules.Ads.Core.Queries;
-using Trill.Shared.Abstractions;
+using Trill.Shared.Abstractions.Dispatchers;
 using Trill.Shared.Abstractions.Queries;
 
 namespace Trill.Modules.Ads.Api.Controllers

@@ -5,8 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Shared\Trill.Shared.Bootstrapper\Trill.Shared.Bootstrapper.csproj" />
     <ProjectReference Include="..\Trill.Modules.Ads.Core\Trill.Modules.Ads.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="module.ads.json" />
+    <Content Include="module.ads.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

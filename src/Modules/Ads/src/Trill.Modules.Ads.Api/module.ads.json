@@ -1,0 +1,8 @@
+﻿{
+  "ads": {
+    "module": {
+      "name": "Ads",
+      "enabled": true
+    }
+  }
+}

@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Shouldly;
-using Trill.Api;
+using Trill.Bootstrapper;
 using Trill.Shared.Tests.Integration;
 using Trill.Tests.EndToEnd.Common;
 using Xunit;

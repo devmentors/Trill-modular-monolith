@@ -1,4 +1,4 @@
-using Trill.Shared.Kernel.Exceptions;
+using Trill.Shared.Abstractions.Kernel;
 
 namespace Trill.Modules.Stories.Core.Exceptions
 {

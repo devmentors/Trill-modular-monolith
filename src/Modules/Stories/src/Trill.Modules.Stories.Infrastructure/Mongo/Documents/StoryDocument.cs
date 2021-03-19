@@ -17,7 +17,8 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Documents
         public long CreatedAt { get; set; }
         public long From { get; set; }
         public long To { get; set; }
-        public bool Highlighted { get;set; }
+        public bool Highlighted { get; set; }
+        public int Version { get; set; }
 
         public StoryDocument()
         {
@@ -34,11 +35,12 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Documents
             From = story.Visibility.From.ToUnixTimeMilliseconds();
             To = story.Visibility.To.ToUnixTimeMilliseconds();
             Highlighted = story.Visibility.Highlighted;
+            Version = story.Version;
         }
 
         public Story ToEntity()
             => new Story(Id, Author.ToValueObject(), Text, Title, Tags,
-                GetDate(CreatedAt), new Visibility(GetDate(From), GetDate(To), Highlighted));
+                GetDate(CreatedAt), new Visibility(GetDate(From), GetDate(To), Highlighted), Version);
 
         private static DateTime GetDate(long timestamp) => DateTimeOffset.FromUnixTimeMilliseconds(timestamp).DateTime;
     }
