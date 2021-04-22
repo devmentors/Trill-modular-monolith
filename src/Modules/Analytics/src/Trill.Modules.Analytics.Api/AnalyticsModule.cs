@@ -11,8 +11,9 @@ namespace Trill.Modules.Analytics.Api
 {
     internal class AnalyticsModule : IModule
     {
+        public const string BasePath = "analytics-module";
         public string Name { get; } = "Analytics";
-        public string Path { get; } = "analytics-module";
+        public string Path => BasePath;
 
         public void ConfigureServices(IServiceCollection services)
         {

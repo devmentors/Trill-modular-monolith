@@ -55,10 +55,10 @@ namespace Trill.Shared.Infrastructure.Auth
             var now = _clock.Current();
             var jwtClaims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, userId),
-                new Claim(JwtRegisteredClaimNames.UniqueName, userId),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, now.ToUnixTimeMilliseconds().ToString())
+                new(JwtRegisteredClaimNames.Sub, userId),
+                new(JwtRegisteredClaimNames.UniqueName, userId),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Iat, now.ToUnixTimeMilliseconds().ToString())
             };
             if (!string.IsNullOrWhiteSpace(role))
             {

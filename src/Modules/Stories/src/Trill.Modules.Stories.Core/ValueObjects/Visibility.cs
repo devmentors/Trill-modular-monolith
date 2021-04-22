@@ -21,7 +21,7 @@ namespace Trill.Modules.Stories.Core.ValueObjects
             Highlighted = highlighted;
         }
 
-        public static Visibility Default(DateTime from) => new Visibility(from, from.AddDays(7), false);
+        public static Visibility Default(DateTime from) => new(from, from.AddDays(7), false);
 
         public bool Equals(Visibility other)
         {

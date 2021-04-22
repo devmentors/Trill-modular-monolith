@@ -13,6 +13,7 @@ using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Generators;
 using Trill.Shared.Abstractions.Kernel;
 using Trill.Shared.Abstractions.Messaging;
+using Trill.Shared.Abstractions.Time;
 
 namespace Trill.Modules.Users.Core.Handlers.Commands
 {
@@ -24,12 +25,13 @@ namespace Trill.Modules.Users.Core.Handlers.Commands
         private readonly IJwtProvider _jwtProvider;
         private readonly IRng _rng;
         private readonly ITokenStorage _storage;
+        private readonly IClock _clock;
         private readonly IMessageBroker _messageBroker;
         private readonly ILogger<SignInHandler> _logger;
 
         public SignInHandler(IUserRepository userRepository, IRefreshTokenRepository refreshTokenRepository,
             IPasswordService passwordService, IJwtProvider jwtProvider, IRng rng, ITokenStorage storage,
-            IMessageBroker messageBroker, ILogger<SignInHandler> logger)
+            IClock clock, IMessageBroker messageBroker, ILogger<SignInHandler> logger)
         {
             _userRepository = userRepository;
             _refreshTokenRepository = refreshTokenRepository;
@@ -37,6 +39,7 @@ namespace Trill.Modules.Users.Core.Handlers.Commands
             _jwtProvider = jwtProvider;
             _rng = rng;
             _storage = storage;
+            _clock = clock;
             _messageBroker = messageBroker;
             _logger = logger;
         }
@@ -71,7 +74,7 @@ namespace Trill.Modules.Users.Core.Handlers.Commands
         private async Task<string> CreateRefreshTokenAsync(Guid userId)
         {
             var token = _rng.Generate(30, true);
-            var refreshToken = new RefreshToken(new AggregateId(), userId, token, DateTime.UtcNow);
+            var refreshToken = new RefreshToken(new AggregateId(), userId, token, _clock.Current());
             await _refreshTokenRepository.AddAsync(refreshToken);
 
             return token;

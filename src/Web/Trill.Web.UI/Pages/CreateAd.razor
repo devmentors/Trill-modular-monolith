@@ -67,7 +67,7 @@
     
     private bool _loading;
     private bool _formLoading;
-    private readonly CreateAdModel _createAdModel = new CreateAdModel();
+    private readonly CreateAdModel _createAdModel = new();
     private decimal Amount { get; set; }
     private DateTime From { get; set; } = DateTime.UtcNow;
     private DateTime To { get; set; } = DateTime.UtcNow.AddDays(7);

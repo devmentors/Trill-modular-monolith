@@ -9,7 +9,7 @@ using Trill.Shared.Abstractions.Queries;
 namespace Trill.Modules.Ads.Api.Controllers
 {
     [ApiController]
-    [Route("ads-module/[controller]")]
+    [Route(AdsModule.BasePath + "/[controller]")]
     internal class AdsController : ControllerBase
     {
         private readonly IDispatcher _dispatcher;

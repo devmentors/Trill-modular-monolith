@@ -7,7 +7,7 @@ using Trill.Modules.Analytics.Core.Services;
 namespace Trill.Modules.Analytics.Api.Controllers
 {
     [ApiController]
-    [Route("analytics-module/[controller]")]
+    [Route(AnalyticsModule.BasePath + "/[controller]")]
     internal class TrendingController : ControllerBase
     {
         private readonly ITrendingService _trendingService;

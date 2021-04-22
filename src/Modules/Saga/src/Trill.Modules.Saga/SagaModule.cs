@@ -10,8 +10,9 @@ namespace Trill.Modules.Saga
 {
     internal class SagaModule : IModule
     {
+        public const string BasePath = "saga-module";
         public string Name { get; } = "Saga";
-        public string Path { get; } = "saga";
+        public string Path => BasePath;
 
         public void ConfigureServices(IServiceCollection services)
         {

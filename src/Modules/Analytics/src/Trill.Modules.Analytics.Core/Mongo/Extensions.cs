@@ -11,7 +11,7 @@ namespace Trill.Modules.Analytics.Core.Mongo
         internal static IApplicationBuilder UseMongo(this IApplicationBuilder builder)
         {
             using var scope = builder.ApplicationServices.CreateScope();
-            var databaseProvider = scope.ServiceProvider.GetService<IDatabaseProvider>();
+            var databaseProvider = scope.ServiceProvider.GetRequiredService<IDatabaseProvider>();
             var tagBuilder = Builders<Tag>.IndexKeys;
             Task.Run(async () => await databaseProvider.Tags.Indexes.CreateManyAsync(
                 new[]

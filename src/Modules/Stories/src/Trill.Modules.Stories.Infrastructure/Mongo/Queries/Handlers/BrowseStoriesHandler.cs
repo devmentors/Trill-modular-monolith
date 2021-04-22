@@ -7,6 +7,7 @@ using Trill.Modules.Stories.Application.Queries;
 using Trill.Modules.Stories.Infrastructure.Mongo.Documents;
 using Trill.Shared.Abstractions;
 using Trill.Shared.Abstractions.Queries;
+using Trill.Shared.Abstractions.Time;
 using Trill.Shared.Infrastructure.Mongo;
 
 namespace Trill.Modules.Stories.Infrastructure.Mongo.Queries.Handlers
@@ -15,15 +16,17 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Queries.Handlers
     {
         private const string Schema = "stories-module";
         private readonly IMongoDatabase _database;
+        private readonly IClock _clock;
 
-        public BrowseStoriesHandler(IMongoDatabase database)
+        public BrowseStoriesHandler(IMongoDatabase database, IClock clock)
         {
             _database = database;
+            _clock = clock;
         }
 
         public async Task<Paged<StoryDto>> HandleAsync(BrowseStories query)
         {
-            var now = query.Now.ToUnixTimeMilliseconds();
+            var now = (query.Now.HasValue ? query.Now.Value : _clock.Current()).ToUnixTimeMilliseconds();
             var documents = _database.GetCollection<StoryDocument>($"{Schema}.stories")
                 .AsQueryable()
                 .Where(x => x.From <= now && x.To >= now);

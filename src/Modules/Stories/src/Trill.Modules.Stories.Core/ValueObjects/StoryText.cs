@@ -13,7 +13,7 @@ namespace Trill.Modules.Stories.Core.ValueObjects
 
         public static implicit operator string(StoryText storyText) => storyText.Value;
 
-        public static implicit operator StoryText(string storyText) => new StoryText(storyText);
+        public static implicit operator StoryText(string storyText) => new(storyText);
 
         public bool Equals(StoryText other)
         {

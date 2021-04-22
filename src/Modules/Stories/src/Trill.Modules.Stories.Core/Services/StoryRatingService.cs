@@ -22,6 +22,7 @@ namespace Trill.Modules.Stories.Core.Services
             }
             
             var totalRating = await _storyRatingRepository.GetTotalRatingAsync(story.Id);
+            totalRating += rate;
             var rating = StoryRating.Create(story.Id, user.Id, rate, totalRating);
 
             return rating;

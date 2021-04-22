@@ -222,7 +222,7 @@
         public string Tags { get; set; }
     }
 
-    private readonly SendStoryModel _sendStoryModel = new SendStoryModel();
+    private readonly SendStoryModel _sendStoryModel = new();
 
     private async Task TimelineSwitchChanged(bool displayTimeline)
     {

@@ -6,6 +6,7 @@ using Trill.Modules.Ads.Core.Domain.Exceptions;
 using Trill.Modules.Ads.Core.Events;
 using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Messaging;
+using Trill.Shared.Abstractions.Time;
 
 namespace Trill.Modules.Ads.Core.Commands.Handlers
 {
@@ -13,13 +14,15 @@ namespace Trill.Modules.Ads.Core.Commands.Handlers
     {
         private readonly IAdRepository _adRepository;
         private readonly IStoryApiClient _storyApiClient;
+        private readonly IClock _clock;
         private readonly IMessageBroker _messageBroker;
 
-        public PublishAdHandler(IAdRepository adRepository, IStoryApiClient storyApiClient,
+        public PublishAdHandler(IAdRepository adRepository, IStoryApiClient storyApiClient, IClock clock,
             IMessageBroker messageBroker)
         {
             _adRepository = adRepository;
             _storyApiClient = storyApiClient;
+            _clock = clock;
             _messageBroker = messageBroker;
         }
 
@@ -31,7 +34,7 @@ namespace Trill.Modules.Ads.Core.Commands.Handlers
                 throw new AdNotFoundException(command.AdId);
             }
 
-            ad.Publish();
+            ad.Publish(_clock.Current());
             var storyId = await _storyApiClient.SendStoryAsync(new SendStory(default, ad.UserId,
                 ad.Header, ad.Content, ad.Tags, ad.From, ad.To, true));
             if (storyId is null)

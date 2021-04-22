@@ -42,6 +42,6 @@ namespace Trill.Shared.Abstractions.Kernel
 
         public static implicit operator Guid(AggregateId id) => id.Value;
 
-        public static implicit operator AggregateId(Guid id) => new AggregateId(id);
+        public static implicit operator AggregateId(Guid id) => new(id);
     }
 }

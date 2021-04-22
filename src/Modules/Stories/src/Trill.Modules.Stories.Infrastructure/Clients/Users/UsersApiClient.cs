@@ -19,7 +19,7 @@ namespace Trill.Modules.Stories.Infrastructure.Clients.Users
 
         public async Task<UserDto> GetAsync(Guid userId)
         {
-            var response = await _moduleClient.RequestAsync<UserDto>($"{Module}/get-user",
+            var response = await _moduleClient.SendAsync<UserDto>($"{Module}/get-user",
                 new GetUser
                 {
                     UserId = userId

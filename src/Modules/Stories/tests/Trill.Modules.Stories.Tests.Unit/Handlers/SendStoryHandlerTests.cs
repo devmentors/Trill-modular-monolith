@@ -8,7 +8,6 @@ using Trill.Modules.Stories.Application.Events;
 using Trill.Modules.Stories.Application.Exceptions;
 using Trill.Modules.Stories.Application.Services;
 using Trill.Modules.Stories.Core.Entities;
-using Trill.Modules.Stories.Core.Exceptions;
 using Trill.Modules.Stories.Core.Factories;
 using Trill.Modules.Stories.Core.Policies;
 using Trill.Modules.Stories.Core.Repositories;
@@ -29,7 +28,8 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
         public async Task story_should_be_added_given_valid_data()
         {
             var user = SetupUser();
-            var command = CreateCommand(user.Id);
+            var command = CreateCommand(0, user.Id);
+            _storyAuthorPolicy.CanCreate(user).Returns(true);
             
             await Act(command);
             
@@ -39,12 +39,33 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
             _storyRequestStorage.Received(1).SetStoryId(command.Id, Arg.Any<long>());
             await _storyRepository.Received(1).AddAsync(Arg.Is<Story>(x => x.Title == command.Title));
         }
+        
+        [Fact]
+        public async Task story_id_should_be_generated_when_providing_the_default_value()
+        {
+            var storyId = 1;
+            var user = SetupUser();
+            var command = CreateCommand(0, user.Id);
+            _storyAuthorPolicy.CanCreate(user).Returns(true);
+            _idGenerator.Generate().Returns(storyId);
+            
+            await Act(command);
+
+            _idGenerator.Received(1);
+            await _storyRepository.Received(1).AddAsync(Arg.Is<Story>(x => x.Id == storyId));
+        }
 
         [Fact]
         public async Task story_sent_event_should_be_published()
         {
             var user = SetupUser();
-            var command = CreateCommand(user.Id);
+            var command = CreateCommand(1, user.Id);
+            _storyAuthorPolicy.CanCreate(user).Returns(true);
+            _eventMapper.Map(Arg.Any<IDomainEvent>()).Returns(new[]
+            {
+                new StorySent(1,
+                    default, default, default, default, default)
+            });
             
             await Act(command);
             
@@ -54,7 +75,7 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
         [Fact]
         public async Task handler_should_fail_given_invalid_user()
         {
-            var command = CreateCommand(Guid.NewGuid());
+            var command = CreateCommand(1, Guid.NewGuid());
             
             var exception = await Record.ExceptionAsync(() => Act(command));
             
@@ -66,12 +87,12 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
         public async Task handler_should_fail_given_locked_user()
         {
             var user = SetupUser(0, true);
-            var command = CreateCommand(user.Id);
+            var command = CreateCommand(1, user.Id);
             
             var exception = await Record.ExceptionAsync(() => Act(command));
             
             exception.ShouldNotBeNull();
-            exception.ShouldBeOfType<UserLockedException>();
+            exception.ShouldBeOfType<CannotCreateStoryException>();
         }
 
         #region Arrange
@@ -111,8 +132,8 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
             return user;
         }
 
-        private static SendStory CreateCommand(Guid userId)
-            => new SendStory(default, userId, "Test", "Lorem ipsum", new[] {"test1", "test2"});
+        private static SendStory CreateCommand(long storyId, Guid userId)
+            => new(storyId, userId, "Test", "Lorem ipsum", new[] {"test1", "test2"});
 
         #endregion
     }

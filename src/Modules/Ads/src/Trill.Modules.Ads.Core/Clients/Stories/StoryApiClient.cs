@@ -16,7 +16,7 @@ namespace Trill.Modules.Ads.Core.Clients.Stories
 
         public async Task<long?> SendStoryAsync(SendStory command)
         {
-            var response = await _moduleClient.RequestAsync<SendStory.Response>($"{Module}/send-story", command);
+            var response = await _moduleClient.SendAsync<SendStory.Response>($"{Module}/send-story", command);
 
             return response?.StoryId;
         }

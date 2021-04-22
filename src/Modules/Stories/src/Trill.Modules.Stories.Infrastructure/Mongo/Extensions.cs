@@ -15,7 +15,7 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo
         internal static IApplicationBuilder UseMongo(this IApplicationBuilder builder)
         {
             using var scope = builder.ApplicationServices.CreateScope();
-            var users = scope.ServiceProvider.GetService<IMongoRepository<UserDocument, Guid>>().Collection;
+            var users = scope.ServiceProvider.GetRequiredService<IMongoRepository<UserDocument, Guid>>().Collection;
             var userBuilder = Builders<UserDocument>.IndexKeys;
             Task.Run(async () => await users.Indexes.CreateManyAsync(
                 new[]
@@ -27,7 +27,7 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo
                         })
                 }));
 
-            var ratings = scope.ServiceProvider.GetService<IMongoDatabase>()
+            var ratings = scope.ServiceProvider.GetRequiredService<IMongoDatabase>()
                 .GetCollection<StoryRatingDocument>($"{Schema}.ratings");
             var ratingBuilder = Builders<StoryRatingDocument>.IndexKeys;
             Task.Run(async () => await ratings.Indexes.CreateManyAsync(

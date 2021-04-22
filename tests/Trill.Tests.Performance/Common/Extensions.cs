@@ -3,9 +3,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using NBomber.Contracts;
-using Newtonsoft.Json;
 using Shouldly;
 using Xunit.Abstractions;
 
@@ -43,7 +43,7 @@ namespace Trill.Tests.Performance.Common
             var requestId = Guid.NewGuid().ToString("N");
             var apiEndpoint = $"{httpClient.BaseAddress}/{endpoint}";
             output?.WriteLine($"Sending a request [ID: '{requestId}'] HTTP {method} '{apiEndpoint}'" +
-                              $"{(data is {} ? $", body: {JsonConvert.SerializeObject(data, Formatting.Indented)}" : "")}...");
+                              $"{(data is {} ? $", body: {JsonSerializer.Serialize(data)}" : "")}...");
             var response = method.Method switch
             {
                 "GET" => await httpClient.GetAsync(endpoint),
@@ -66,10 +66,10 @@ namespace Trill.Tests.Performance.Common
         }
 
         private static StringContent GetPayload(object value)
-            => new StringContent(JsonConvert.SerializeObject(value), Encoding.UTF8, "application/json");
+            => new(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json");
 
         public static async Task<T> ReadAsync<T>(this HttpResponseMessage response)
-            => JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+            => JsonSerializer.Deserialize<T>(await response.Content.ReadAsStringAsync());
 
         public static Guid GetIdFromLocationHeader(this HttpResponseMessage response)
             => Guid.Parse(response.Headers.Location.ToString().Split("/").Last());

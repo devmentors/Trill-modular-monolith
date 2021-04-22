@@ -28,7 +28,7 @@ namespace Trill.Shared.Infrastructure.Messaging.Dispatchers
             {
                 try
                 {
-                    await _moduleClient.SendAsync(@event);
+                    await _moduleClient.PublishAsync(@event);
                 }
                 catch (Exception exception)
                 {

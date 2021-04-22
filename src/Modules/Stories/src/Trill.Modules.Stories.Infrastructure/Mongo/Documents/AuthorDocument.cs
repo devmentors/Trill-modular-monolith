@@ -18,6 +18,6 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Documents
             Name = author.Name;
         }
 
-        public Author ToValueObject() => new Author(Id, Name);
+        public Author ToValueObject() => new(Id, Name);
     }
 }

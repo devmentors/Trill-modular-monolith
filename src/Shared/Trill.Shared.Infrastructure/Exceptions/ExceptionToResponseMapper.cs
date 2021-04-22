@@ -8,7 +8,7 @@ namespace Trill.Shared.Infrastructure.Exceptions
 {
     internal sealed class ExceptionToResponseMapper : IExceptionToResponseMapper
     {
-        private static readonly ConcurrentDictionary<Type, string> Codes = new ConcurrentDictionary<Type, string>();
+        private static readonly ConcurrentDictionary<Type, string> Codes = new();
 
         public ExceptionResponse Map(Exception exception)
             => exception switch

@@ -13,8 +13,9 @@ namespace Trill.Modules.Ads.Api
 {
     internal class AdsModule : IModule
     {
+        public const string BasePath = "ads-module";
         public string Name { get; } = "Ads";
-        public string Path { get; } = "ads-module";
+        public string Path => BasePath;
 
         public void ConfigureServices(IServiceCollection services)
         {

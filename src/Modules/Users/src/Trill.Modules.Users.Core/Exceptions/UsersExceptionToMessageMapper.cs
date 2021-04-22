@@ -22,6 +22,6 @@ namespace Trill.Modules.Users.Core.Exceptions
             };
 
         private static UserActionRejected Map(Guid userId, Exception exception)
-            => new UserActionRejected(userId, exception.GetExceptionCode(), exception.Message);
+            => new(userId, exception.GetExceptionCode(), exception.Message);
     }
 }

@@ -13,12 +13,12 @@ namespace Trill.Web.UI
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("app");
+            builder.RootComponents.Add<App>("#app");
             builder.Services.AddCore();
+            builder.Services.AddScoped<IApiResponseHandler, ApiResponseHandler>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddScoped(sp => new HttpClient {BaseAddress = new Uri("http://localhost:5000")});
             builder.Services.AddAntDesign();
-            builder.Services.AddScoped<IApiResponseHandler, ApiResponseHandler>();
             var host = builder.Build();
             var authenticationService = host.Services.GetRequiredService<IAuthenticationService>();
             await authenticationService.InitializeAsync();

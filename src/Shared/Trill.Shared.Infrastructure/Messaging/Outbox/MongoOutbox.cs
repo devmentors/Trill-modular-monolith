@@ -1,16 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using Trill.Shared.Abstractions;
 using Trill.Shared.Abstractions.Messaging;
 using Trill.Shared.Abstractions.Modules;
+using Trill.Shared.Abstractions.Time;
 using Trill.Shared.Infrastructure.Messaging.Dispatchers;
 using Trill.Shared.Infrastructure.Modules;
 
@@ -18,17 +17,16 @@ namespace Trill.Shared.Infrastructure.Messaging.Outbox
 {
     internal sealed class MongoOutbox : IOutbox
     {
-        private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+        private static readonly JsonSerializerOptions SerializerOptions = new()
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            Converters = new List<JsonConverter>
-            {
-                new StringEnumConverter(new CamelCaseNamingStrategy())
-            }
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = { new JsonStringEnumConverter()}
         };
-
+        
         private readonly IMongoDatabase _database;
         private readonly IModuleClient _moduleClient;
+        private readonly IClock _clock;
         private readonly IAsyncMessageDispatcher _asyncMessageDispatcher;
         private readonly ILogger<MongoOutbox> _logger;
         private readonly string _collectionName;
@@ -38,11 +36,12 @@ namespace Trill.Shared.Infrastructure.Messaging.Outbox
         public bool Enabled { get; }
 
         public MongoOutbox(IMongoDatabase database, IModuleRegistry moduleRegistry, OutboxOptions outboxOptions, 
-            MessagingOptions messagingOptions, IModuleClient moduleClient, IAsyncMessageDispatcher asyncMessageDispatcher,
-            ILogger<MongoOutbox> logger)
+            MessagingOptions messagingOptions, IModuleClient moduleClient, IClock clock,
+            IAsyncMessageDispatcher asyncMessageDispatcher, ILogger<MongoOutbox> logger)
         {
             _database = database;
             _moduleClient = moduleClient;
+            _clock = clock;
             _asyncMessageDispatcher = asyncMessageDispatcher;
             _logger = logger;
             Enabled = outboxOptions.Enabled;
@@ -73,9 +72,9 @@ namespace Trill.Shared.Infrastructure.Messaging.Outbox
                     Id = x.Id,
                     CorrelationId = x.CorrelationId,
                     Name = x.GetType().Name.Underscore(),
-                    Payload = JsonConvert.SerializeObject(x, SerializerSettings),
+                    Payload = JsonSerializer.Serialize(x, SerializerOptions),
                     Type = x.GetType().AssemblyQualifiedName,
-                    ReceivedAt = DateTime.UtcNow.ToUnixTimeMilliseconds()
+                    ReceivedAt = _clock.Current().ToUnixTimeMilliseconds()
                 }).ToArray();
 
             if (!outboxMessages.Any())
@@ -109,7 +108,7 @@ namespace Trill.Shared.Infrastructure.Messaging.Outbox
             foreach (var outboxMessage in unsentMessages)
             {
                 var type = Type.GetType(outboxMessage.Type);
-                var message = JsonConvert.DeserializeObject(outboxMessage.Payload, type, SerializerSettings) as IMessage;
+                var message = JsonSerializer.Deserialize(outboxMessage.Payload, type, SerializerOptions) as IMessage;
                 if (message is null)
                 {
                     _logger.LogError($"Invalid message type: {type?.Name} (cannot cast to {nameof(IMessage)}).");
@@ -128,10 +127,10 @@ namespace Trill.Shared.Infrastructure.Messaging.Outbox
                 }
                 else
                 {
-                    await _moduleClient.SendAsync(message);
+                    await _moduleClient.PublishAsync(message);
                 }
 
-                outboxMessage.SentAt = DateTime.UtcNow.ToUnixTimeMilliseconds();
+                outboxMessage.SentAt = _clock.Current().ToUnixTimeMilliseconds();
                 await collection.ReplaceOneAsync(x => x.Id == outboxMessage.Id, outboxMessage);
                 _logger.LogInformation($"Published a message: '{name}' with ID: '{message.Id} (outbox)'.");
             }

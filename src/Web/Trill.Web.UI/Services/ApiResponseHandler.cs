@@ -43,6 +43,12 @@ namespace Trill.Web.UI.Services
 
         private async Task HandleErrorAsync(ApiResponse response)
         {
+            if (response?.HttpResponse is null)
+            {
+                await _messageService.Error("There was an error.");
+                return;
+            }
+        
             if (response.HttpResponse.StatusCode == HttpStatusCode.Unauthorized)
             {
                 await _messageService.Error("Your session has expired - please sign in again.");

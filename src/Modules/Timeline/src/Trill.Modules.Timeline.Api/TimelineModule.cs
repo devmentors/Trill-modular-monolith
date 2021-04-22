@@ -13,10 +13,10 @@ namespace Trill.Modules.Timeline.Api
 {
     internal class TimelineModule : IModule
     {
+        public const string BasePath = "timeline-module";
         public string Name { get; } = "Timeline";
-        public string Path { get; } = "timeline-module";
-
-
+        public string Path => BasePath;
+        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCore();

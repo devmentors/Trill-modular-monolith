@@ -25,6 +25,6 @@ namespace Trill.Modules.Users.Core.Mongo.Documents
             RevokedAt = refreshToken.RevokedAt;
         }
 
-        public RefreshToken ToEntity() => new RefreshToken(Id, UserId, Token, CreatedAt, RevokedAt);
+        public RefreshToken ToEntity() => new(Id, UserId, Token, CreatedAt, RevokedAt);
     }
 }

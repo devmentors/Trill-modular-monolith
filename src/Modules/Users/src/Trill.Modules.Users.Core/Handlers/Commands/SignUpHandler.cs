@@ -1,4 +1,3 @@
-using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -10,6 +9,7 @@ using Trill.Modules.Users.Core.Events;
 using Trill.Modules.Users.Core.Services;
 using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Messaging;
+using Trill.Shared.Abstractions.Time;
 
 namespace Trill.Modules.Users.Core.Handlers.Commands
 {
@@ -17,19 +17,21 @@ namespace Trill.Modules.Users.Core.Handlers.Commands
     {
         private readonly IUserRepository _userRepository;
         private readonly IPasswordService _passwordService;
+        private readonly IClock _clock;
         private readonly IMessageBroker _messageBroker;
         private readonly ILogger<SignUpHandler> _logger;
 
-        private static readonly Regex EmailRegex = new Regex(
+        private static readonly Regex EmailRegex = new(
             @"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
             @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$",
             RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         public SignUpHandler(IUserRepository userRepository, IPasswordService passwordService,
-            IMessageBroker messageBroker, ILogger<SignUpHandler> logger)
+           IClock clock, IMessageBroker messageBroker, ILogger<SignUpHandler> logger)
         {
             _userRepository = userRepository;
             _passwordService = passwordService;
+            _clock = clock;
             _messageBroker = messageBroker;
             _logger = logger;
         }
@@ -59,7 +61,7 @@ namespace Trill.Modules.Users.Core.Handlers.Commands
 
             var role = string.IsNullOrWhiteSpace(command.Role) ? "user" : command.Role.ToLowerInvariant();
             var password = _passwordService.Hash(command.Password);
-            user = new User(command.UserId, command.Email, command.Name, password, role, DateTime.UtcNow,
+            user = new User(command.UserId, command.Email, command.Name, password, role, _clock.Current(),
                 command.Permissions, bonusFunds);
             await _userRepository.AddAsync(user);
             _logger.LogInformation($"Created an account for the user with ID: '{user.Id}'.");

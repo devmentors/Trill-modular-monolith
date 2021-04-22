@@ -10,6 +10,6 @@ namespace Trill.Modules.Stories.Core.Entities
 
         public static implicit operator long(StoryId id) => id.Value;
 
-        public static implicit operator StoryId(long id) => new StoryId(id);
+        public static implicit operator StoryId(long id) => new(id);
     }
 }

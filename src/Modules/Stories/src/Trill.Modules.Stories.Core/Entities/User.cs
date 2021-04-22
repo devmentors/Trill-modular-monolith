@@ -25,7 +25,7 @@ namespace Trill.Modules.Stories.Core.Entities
 
         public void AddRating(int rating)
         {
-            
+            Rating += rating;
         }
     }
 }

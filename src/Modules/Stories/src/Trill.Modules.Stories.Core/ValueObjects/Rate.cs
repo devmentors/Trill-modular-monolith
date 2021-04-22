@@ -9,7 +9,7 @@ namespace Trill.Modules.Stories.Core.ValueObjects
 
         public Rate(int value)
         {
-            if (value < -1 || value > 1)
+            if (value is < -1 or > 1)
             {
                 throw new InvalidRateException(value);
             }
@@ -19,7 +19,7 @@ namespace Trill.Modules.Stories.Core.ValueObjects
         
         public static implicit operator int(Rate rate) => rate.Value;
 
-        public static implicit operator Rate(int rate) => new Rate(rate);
+        public static implicit operator Rate(int rate) => new(rate);
 
         public bool Equals(Rate other)
         {

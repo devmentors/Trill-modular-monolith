@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Trill.Modules.Users.Core.Commands;
 using Trill.Modules.Users.Core.Domain.Entities;
@@ -8,6 +7,7 @@ using Trill.Modules.Users.Core.Exceptions;
 using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Kernel;
 using Trill.Shared.Abstractions.Messaging;
+using Trill.Shared.Abstractions.Time;
 
 namespace Trill.Modules.Users.Core.Handlers.Commands
 {
@@ -15,13 +15,15 @@ namespace Trill.Modules.Users.Core.Handlers.Commands
     {
         private readonly IFollowerRepository _followerRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IClock _clock;
         private readonly IMessageBroker _messageBroker;
 
         public FollowUserHandler(IFollowerRepository  followerRepository, IUserRepository userRepository,
-            IMessageBroker messageBroker)
+           IClock clock, IMessageBroker messageBroker)
         {
             _followerRepository = followerRepository;
             _userRepository = userRepository;
+            _clock = clock;
             _messageBroker = messageBroker;
         }
 
@@ -45,7 +47,7 @@ namespace Trill.Modules.Users.Core.Handlers.Commands
             }
 
             await _followerRepository.AddAsync(new Follower(new AggregateId(), command.UserId, command.FolloweeId,
-                DateTime.UtcNow));
+                _clock.Current()));
             await _messageBroker.PublishAsync(new UserFollowed(command.UserId, command.FolloweeId));
         }
     }

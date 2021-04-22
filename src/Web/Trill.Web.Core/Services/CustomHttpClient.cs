@@ -2,15 +2,22 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Trill.Web.Core.Storage;
 
 namespace Trill.Web.Core.Services
 {
     public sealed class CustomHttpClient : IHttpClient
     {
+        private static readonly JsonSerializerOptions SerializerOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = { new JsonStringEnumConverter()}
+        };
         private readonly HttpClient _client;
         private readonly ILocalStorageService _localStorageService;
         private readonly ILogger<CustomHttpClient> _logger;
@@ -64,7 +71,7 @@ namespace Trill.Web.Core.Services
         }
 
         private static StringContent GetPayload<T>(T request) 
-            => new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+            => new(JsonSerializer.Serialize(request, SerializerOptions), Encoding.UTF8, "application/json");
 
         private async Task<ApiResponse<T>> TryRequestAsync<T>(HttpRequestMessage request)
         {
@@ -86,15 +93,28 @@ namespace Trill.Web.Core.Services
                 var payload = await response.Content.ReadAsStringAsync();
                 if (!isValid)
                 {
-                    var error = string.IsNullOrWhiteSpace(payload)
-                        ? null
-                        : JsonConvert.DeserializeObject<ApiResponse.ErrorResponse>(payload);
                     _logger.LogError(response.ToString());
                     _logger.LogError(payload);
+
+                    if (!payload.Contains("code"))
+                    {
+                        return new ApiResponse<T>(default, response, false, new ApiResponse.ErrorResponse
+                        {
+                            Code = "error",
+                            Reason = payload
+                        });
+                    }
+
+                    var error = string.IsNullOrWhiteSpace(payload)
+                        ? default
+                        : JsonSerializer.Deserialize<ApiResponse.ErrorResponse>(payload, SerializerOptions);
+
                     return new ApiResponse<T>(default, response, false, error);
                 }
 
-                var result = JsonConvert.DeserializeObject<T>(payload);
+                var result = string.IsNullOrWhiteSpace(payload)
+                    ? default
+                    : JsonSerializer.Deserialize<T>(payload, SerializerOptions);
 
                 return new ApiResponse<T>(result, response, true);
             }

@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -7,6 +6,7 @@ using Trill.Modules.Stories.Application.Queries;
 using Trill.Modules.Stories.Infrastructure.Mongo.Documents;
 using Trill.Shared.Abstractions;
 using Trill.Shared.Abstractions.Queries;
+using Trill.Shared.Abstractions.Time;
 
 namespace Trill.Modules.Stories.Infrastructure.Mongo.Queries.Handlers
 {
@@ -14,10 +14,12 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Queries.Handlers
     {
         private const string Schema = "stories-module";
         private readonly IMongoDatabase _database;
+        private readonly IClock _clock;
 
-        public GetStoryHandler(IMongoDatabase database)
+        public GetStoryHandler(IMongoDatabase database, IClock clock)
         {
             _database = database;
+            _clock = clock;
         }
 
         public async Task<StoryDetailsDto> HandleAsync(GetStory query)
@@ -31,7 +33,7 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Queries.Handlers
                 return null;
             }
 
-            var now = DateTime.UtcNow.ToUnixTimeMilliseconds();
+            var now = _clock.Current().ToUnixTimeMilliseconds();
             if (story.From > now || story.To < now)
             {
                 return null;
@@ -44,6 +46,5 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Queries.Handlers
 
             return story.ToDetailsDto(rates, query.UserId);
         }
-        
     }
 }

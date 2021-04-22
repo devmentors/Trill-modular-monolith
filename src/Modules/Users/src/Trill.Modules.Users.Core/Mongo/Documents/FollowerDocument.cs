@@ -23,6 +23,6 @@ namespace Trill.Modules.Users.Core.Mongo.Documents
             CreatedAt = follower.CreatedAt;
         }
 
-        public Follower ToEntity() => new Follower(Id, FollowerId, FolloweeId, CreatedAt);
+        public Follower ToEntity() => new(Id, FollowerId, FolloweeId, CreatedAt);
     }
 }

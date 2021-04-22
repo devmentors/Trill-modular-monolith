@@ -34,6 +34,6 @@ namespace Trill.Modules.Users.Core.Mongo.Documents
             Locked = user.Locked;
         }
 
-        public User ToEntity() => new User(Id, Email, Name, Password, Role, CreatedAt, Permissions, Funds, Locked);
+        public User ToEntity() => new(Id, Email, Name, Password, Role, CreatedAt, Permissions, Funds, Locked);
     }
 }

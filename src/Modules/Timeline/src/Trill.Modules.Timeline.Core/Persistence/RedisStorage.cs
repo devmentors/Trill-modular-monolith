@@ -6,25 +6,28 @@ using System.Threading.Tasks;
 using StackExchange.Redis;
 using Trill.Modules.Timeline.Core.Data;
 using Trill.Shared.Abstractions;
+using Trill.Shared.Abstractions.Time;
 
 namespace Trill.Modules.Timeline.Core.Persistence
 {
     internal class RedisStorage : IStorage
     {
         private readonly IDatabase _database;
+        private readonly IClock _clock;
 
-        public RedisStorage(IDatabase database)
+        public RedisStorage(IDatabase database, IClock clock)
         {
             _database = database;
+            _clock = clock;
         }
 
         public async Task<Paged<Story>> GetTimelineAsync(Guid userId, DateTime? from = null, DateTime? to = null)
         {
-            var now = DateTime.UtcNow;
-            var minScore = GetScore(from ?? DateTime.UtcNow.AddDays(-7));
-            var maxScore = GetScore(to ?? DateTime.UtcNow);
+            var now = _clock.Current();
+            var minScore = GetScore(from ?? now.AddDays(-7));
+            var maxScore = GetScore(to ?? now);
             var storyIds = await _database.SortedSetRangeByScoreAsync(GetTimelineKey(userId), minScore, maxScore);
-            var storyKeys = storyIds.Select(x => (RedisKey) GetStoryKey((long)x)).ToArray();
+            var storyKeys = storyIds.Select(x => (RedisKey) GetStoryKey((long) x)).ToArray();
             var storyEntries = await _database.StringGetAsync(storyKeys);
             var stories = new List<Story>();
             foreach (var entry in storyEntries)

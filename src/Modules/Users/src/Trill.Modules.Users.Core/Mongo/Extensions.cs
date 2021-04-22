@@ -13,7 +13,7 @@ namespace Trill.Modules.Users.Core.Mongo
         internal static IApplicationBuilder UseMongo(this IApplicationBuilder builder)
         {
             using var scope = builder.ApplicationServices.CreateScope();
-            var users = scope.ServiceProvider.GetService<IMongoRepository<UserDocument, Guid>>().Collection;
+            var users = scope.ServiceProvider.GetRequiredService<IMongoRepository<UserDocument, Guid>>().Collection;
             var userBuilder = Builders<UserDocument>.IndexKeys;
             Task.Run(async () => await users.Indexes.CreateManyAsync(
                 new[]
@@ -30,7 +30,7 @@ namespace Trill.Modules.Users.Core.Mongo
                         })
                 }));
 
-            var followers = scope.ServiceProvider.GetService<IMongoRepository<FollowerDocument, Guid>>().Collection;
+            var followers = scope.ServiceProvider.GetRequiredService<IMongoRepository<FollowerDocument, Guid>>().Collection;
             var followerBuilder = Builders<FollowerDocument>.IndexKeys;
             Task.Run(async () => await followers.Indexes.CreateManyAsync(
                 new[]

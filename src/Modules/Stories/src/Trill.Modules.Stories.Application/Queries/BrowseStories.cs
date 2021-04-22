@@ -7,6 +7,6 @@ namespace Trill.Modules.Stories.Application.Queries
     internal class BrowseStories : PagedQueryBase, IQuery<Paged<StoryDto>>
     {
         public string Query { get; set; }
-        public DateTime Now { get; set; } = DateTime.UtcNow;
+        public DateTime? Now { get; set; }
     }
 }

@@ -15,6 +15,6 @@ namespace Trill.Modules.Stories.Core.Entities
         
         public static implicit operator Guid(UserId id) => id.Value;
 
-        public static implicit operator UserId(Guid id) => new UserId(id);
+        public static implicit operator UserId(Guid id) => new(id);
     }
 }

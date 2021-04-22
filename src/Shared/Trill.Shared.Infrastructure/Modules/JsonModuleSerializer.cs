@@ -1,18 +1,26 @@
 using System;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Trill.Shared.Infrastructure.Modules
 {
-    internal class JsonModuleSerializer : IModuleSerializer
+    internal sealed class JsonModuleSerializer : IModuleSerializer
     {
+        private static readonly JsonSerializerOptions SerializerOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = {new JsonStringEnumConverter()}
+        };
+
         public byte[] Serialize<T>(T value)
-            => Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value));
+            => Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value, SerializerOptions));
 
         public T Deserialize<T>(byte[] value)
-            => JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(value));
+            => JsonSerializer.Deserialize<T>(Encoding.UTF8.GetString(value), SerializerOptions);
 
         public object Deserialize(byte[] value, Type type)
-            => JsonConvert.DeserializeObject(Encoding.UTF8.GetString(value), type);
+            => JsonSerializer.Deserialize(Encoding.UTF8.GetString(value), type, SerializerOptions);
     }
 }

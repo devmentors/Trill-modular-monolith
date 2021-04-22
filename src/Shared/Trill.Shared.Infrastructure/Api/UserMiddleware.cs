@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -14,7 +15,7 @@ namespace Trill.Shared.Infrastructure.Api
         {
             "POST", "PUT", "PATCH"
         };
-        
+
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             var request = context.Request;
@@ -31,26 +32,20 @@ namespace Trill.Shared.Infrastructure.Api
             }
 
             var path = context.Request.Path.Value;
-            if (path.Contains("sign-in") || path.Contains("sign-up"))
+            if (path is not null && (path.Contains("sign-in") || path.Contains("sign-up")))
             {
                 await next(context);
                 return;
             }
 
             var authenticateResult = await context.AuthenticateAsync();
-            if (!authenticateResult.Succeeded)
+            if (!authenticateResult.Succeeded || authenticateResult.Principal is null)
             {
                 context.Response.StatusCode = 401;
                 return;
             }
 
-            var content = string.Empty;
-            if (request.Body is null)
-            {
-                await next(context);
-                return;
-            }
-
+            string content;
             context.User = authenticateResult.Principal;
             using (var reader = new StreamReader(request.Body))
             {
@@ -58,7 +53,13 @@ namespace Trill.Shared.Infrastructure.Api
             }
 
             var payload = JsonSerializer.Deserialize<Dictionary<string, object>>(content);
-            payload["UserId"] = context.User.Identity.Name;
+            if (payload is null)
+            {
+                await next(context);
+                return;
+            }
+
+            payload["userId"] = Guid.Parse(context.User.Identity.Name);
             var json = JsonSerializer.Serialize(payload);
             await using var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
             context.Request.Body = memoryStream;

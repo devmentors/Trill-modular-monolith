@@ -17,7 +17,7 @@ namespace Trill.Modules.Ads.Core.Clients.Users
 
         public async Task<bool> ChargeFundsAsync(Guid userId, decimal amount)
         {
-            var response = await _moduleClient.RequestAsync<ChargeFunds.Response>($"{Module}/charge-funds",
+            var response = await _moduleClient.SendAsync<ChargeFunds.Response>($"{Module}/charge-funds",
                 new ChargeFunds(userId, amount));
             return response?.Charged ?? false;
         }

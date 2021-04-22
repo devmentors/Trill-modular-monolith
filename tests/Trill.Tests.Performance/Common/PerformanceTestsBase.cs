@@ -2,12 +2,12 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using NBomber.Contracts;
 using NBomber.CSharp;
 using NBomber.Http;
 using NBomber.Plugins.Http.CSharp;
-using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -34,7 +34,7 @@ namespace Trill.Tests.Performance.Common
                 .WithLoadSimulations(LoadSimulation.NewKeepConstant(parallelCopies, period ?? TimeSpan.FromSeconds(10)));
 
             var stats = NBomberRunner.RegisterScenarios(scenario).Run();
-            var jsonStats = JsonConvert.SerializeObject(stats, Formatting.Indented);
+            var jsonStats = JsonSerializer.Serialize(stats);
             Output.WriteLine(jsonStats);
 
             return stats;
@@ -75,7 +75,7 @@ namespace Trill.Tests.Performance.Common
             => Task.FromResult(response.IsSuccessStatusCode ? Response.Ok() : Response.Fail());
 
         protected static StringContent GetPayload(object value)
-            => new StringContent(JsonConvert.SerializeObject(value), Encoding.UTF8, "application/json");
+            => new(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json");
         
         #region Arrange
 

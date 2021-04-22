@@ -23,9 +23,9 @@ namespace Trill.Modules.Stories.Api
 {
     internal class StoriesModule : IModule
     {
+        public const string BasePath = "stories-module";
         public string Name { get; } = "Stories";
-        public string Path { get; } = "stories-module";
-
+        public string Path => BasePath;
 
         public void ConfigureServices(IServiceCollection services)
         {

@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: unless-stopped
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=root
+    #   - MONGO_INITDB_ROOT_PASSWORD=secret
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo:/data/db
+
+  redis:
+    image: redis
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    volumes: 
+      - redis:/data
+
+volumes:
+  mongo:
+    driver: local
+  redis:
+    driver: local

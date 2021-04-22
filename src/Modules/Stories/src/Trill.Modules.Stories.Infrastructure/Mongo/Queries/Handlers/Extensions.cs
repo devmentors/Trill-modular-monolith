@@ -25,7 +25,7 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Queries.Handlers
 
         private static T Map<T>(this StoryDocument story, IList<StoryRatingDocument> rates)
             where T : StoryDto, new()
-            => new T
+            => new()
             {
                 Id = story.Id,
                 Author = new AuthorDto
@@ -42,7 +42,7 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Queries.Handlers
                     Highlighted = story.Highlighted
                 },
                 CreatedAt = GetDate(story.CreatedAt),
-                TotalRate = rates.Sum(x => x.Rate),
+                TotalRate = rates.Where(x => x.StoryId == story.Id).Sum(x => x.Rate),
             };
 
         private static DateTime GetDate(long timestamp) => DateTimeOffset.FromUnixTimeMilliseconds(timestamp).DateTime;

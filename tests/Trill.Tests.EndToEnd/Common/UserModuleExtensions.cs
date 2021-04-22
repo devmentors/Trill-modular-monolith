@@ -24,6 +24,7 @@ namespace Trill.Tests.EndToEnd.Common
             var command = new SignIn($"user-{userId}", "secret");
             var response = await client.PostAsync($"{Module}/sign-in", command.GetPayload());
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            
             return await response.ReadAsync<AuthDto>();
         }
     }

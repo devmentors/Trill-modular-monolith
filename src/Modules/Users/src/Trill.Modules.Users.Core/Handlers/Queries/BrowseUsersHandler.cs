@@ -52,7 +52,7 @@ namespace Trill.Modules.Users.Core.Handlers.Queries
         }
 
         private static UserDto Map(UserDocument user, ISet<Guid> followers)
-            => new UserDto
+            => new()
             {
                 Id = user.Id,
                 Name = user.Name,

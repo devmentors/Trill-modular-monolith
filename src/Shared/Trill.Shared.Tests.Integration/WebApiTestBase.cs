@@ -2,11 +2,12 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Trill.Bootstrapper;
 using Xunit;
 
@@ -15,6 +16,13 @@ namespace Trill.Shared.Tests.Integration
     public abstract class WebApiTestBase : IDisposable, IClassFixture<WebApplicationFactory<Program>>,
         IClassFixture<MongoFixture>
     {
+        private static readonly JsonSerializerOptions SerializerOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = {new JsonStringEnumConverter()}
+        };
+        
         private string _route;
 
         protected void SetPath(string route)
@@ -38,7 +46,7 @@ namespace Trill.Shared.Tests.Integration
             _route = $"{route}/";
         }
 
-        protected static T Map<T>(object data) => JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(data));
+        protected static T Map<T>(object data) => JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(data, SerializerOptions), SerializerOptions);
 
         protected Task<HttpResponseMessage> GetAsync(string endpoint)
             => Client.GetAsync(GetEndpoint(endpoint));
@@ -80,10 +88,10 @@ namespace Trill.Shared.Tests.Integration
         private string GetEndpoint(string endpoint) => $"{_route}{endpoint}";
 
         private static StringContent GetPayload(object value)
-            => new StringContent(JsonConvert.SerializeObject(value), Encoding.UTF8, "application/json");
+            => new(JsonSerializer.Serialize(value, SerializerOptions), Encoding.UTF8, "application/json");
 
         protected static async Task<T> ReadAsync<T>(HttpResponseMessage response)
-            => JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+            => JsonSerializer.Deserialize<T>(await response.Content.ReadAsStringAsync(), SerializerOptions);
 
         #region Arrange
 

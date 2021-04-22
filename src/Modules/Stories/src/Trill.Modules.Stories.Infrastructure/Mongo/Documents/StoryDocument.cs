@@ -39,7 +39,7 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Documents
         }
 
         public Story ToEntity()
-            => new Story(Id, Author.ToValueObject(), Text, Title, Tags,
+            => new(Id, Author.ToValueObject(), Text, Title, Tags,
                 GetDate(CreatedAt), new Visibility(GetDate(From), GetDate(To), Highlighted), Version);
 
         private static DateTime GetDate(long timestamp) => DateTimeOffset.FromUnixTimeMilliseconds(timestamp).DateTime;

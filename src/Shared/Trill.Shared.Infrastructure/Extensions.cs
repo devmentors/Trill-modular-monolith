@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Figgle;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Dispatchers;
 using Trill.Shared.Abstractions.Events;
@@ -112,6 +111,12 @@ namespace Trill.Shared.Infrastructure
                     });
                 })
                 .AddControllers()
+                .AddJsonOptions(x =>
+                {
+                    x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    x.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                    x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                })
                 .ConfigureApplicationPartManager(manager =>
                 {
                     var removedParts = new List<ApplicationPart>();
@@ -128,14 +133,6 @@ namespace Trill.Shared.Infrastructure
                     }
 
                     manager.FeatureProviders.Add(new InternalControllerFeatureProvider());
-                })
-                .AddNewtonsoftJson(x =>
-                {
-                    x.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                    x.SerializerSettings.Converters = new List<JsonConverter>
-                    {
-                        new StringEnumConverter(new CamelCaseNamingStrategy())
-                    };
                 });
 
             services.TryDecorate(typeof(ICommandHandler<>), typeof(UnitOfWorkCommandHandlerDecorator<>));

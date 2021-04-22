@@ -56,7 +56,7 @@ namespace Trill.Modules.Ads.Core.Domain
             Amount = (int) Math.Floor((To - From).TotalDays) * 100;
         }
 
-        public void Approve()
+        public void Approve(DateTime approvedAt)
         {
             if (State != AdState.New)
             {
@@ -64,10 +64,10 @@ namespace Trill.Modules.Ads.Core.Domain
             }
             
             State = AdState.Approved;
-            ApprovedAt = DateTime.UtcNow;
+            ApprovedAt = approvedAt;
         }
 
-        public void Reject()
+        public void Reject(DateTime rejectedAt)
         {
             if (State != AdState.New)
             {
@@ -75,21 +75,21 @@ namespace Trill.Modules.Ads.Core.Domain
             }
             
             State = AdState.Rejected;
-            RejectedAt = DateTime.UtcNow;
+            RejectedAt = rejectedAt;
         }
 
-        public void Pay()
+        public void Pay(DateTime paidAt)
         {
             if (State != AdState.Approved)
             {
                 throw new CannotChangeAdStateException(Id);
             }
-            
-            PaidAt = DateTime.UtcNow;
+
+            PaidAt = paidAt;
         }
         
         
-        public void Publish()
+        public void Publish(DateTime publishedAt)
         {
             if (State != AdState.Approved)
             {
@@ -100,8 +100,8 @@ namespace Trill.Modules.Ads.Core.Domain
             {
                 throw new CannotPublishAdAException(Id);
             }
-            
-            PublishedAt = DateTime.UtcNow;
+
+            PublishedAt = publishedAt;
         }
 
         public void SetStoryId(long storyId)

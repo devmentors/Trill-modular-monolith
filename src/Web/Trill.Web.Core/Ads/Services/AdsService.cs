@@ -25,9 +25,20 @@ namespace Trill.Web.Core.Ads.Services
             => _client.PostAsync("ads-module/ads", request);
 
         public Task<ApiResponse> ApproveAsync(Guid adId)
-            => _client.PutAsync($"ads-module/ads/{adId}/approve", new {adId});
+            => _client.PutAsync($"ads-module/ads/{adId}/approve", new AdRequest
+            {
+                AdId = adId
+            });
 
         public Task<ApiResponse> RejectAsync(Guid adId)
-            => _client.PutAsync($"ads-module/ads/{adId}/reject", new {adId});
+            => _client.PutAsync($"ads-module/ads/{adId}/reject", new AdRequest
+            {
+                AdId = adId
+            });
+
+        private class AdRequest
+        {
+            public Guid AdId { get; set; }
+        }
     }
 }

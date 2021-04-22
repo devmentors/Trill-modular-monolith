@@ -13,9 +13,7 @@ namespace Trill.Shared.Infrastructure.Modules
 {
     internal sealed class ModuleClient : IModuleClient
     {
-        private readonly ConcurrentDictionary<Type, MessageAttribute> _registrations =
-            new ConcurrentDictionary<Type, MessageAttribute>();
-
+        private readonly ConcurrentDictionary<Type, MessageAttribute> _messages = new();
         private readonly IModuleRegistry _moduleRegistry;
         private readonly IModuleSerializer _serializer;
 
@@ -24,8 +22,10 @@ namespace Trill.Shared.Infrastructure.Modules
             _moduleRegistry = moduleRegistry;
             _serializer = serializer;
         }
+        
+        public Task SendAsync(string path, object request) => SendAsync<object>(path, request);
 
-        public async Task<TResult> RequestAsync<TResult>(string path, object request) where TResult : class
+        public async Task<TResult> SendAsync<TResult>(string path, object request) where TResult : class
         {
             var registration = _moduleRegistry.GetRequestRegistration(path);
             if (registration is null)
@@ -41,11 +41,11 @@ namespace Trill.Shared.Infrastructure.Modules
 
             var receiverRequest = TranslateType(request, registration.RequestType);
             var result = await registration.Action(receiverRequest);
-
-            return _serializer.Deserialize<TResult>(_serializer.Serialize(result));
+            
+            return result is null ? null : TranslateType<TResult>(result);
         }
 
-        public async Task SendAsync(IMessage message)
+        public async Task PublishAsync(IMessage message)
         {
             var module = message.GetModuleName();
             var tasks = new List<Task>();
@@ -56,7 +56,7 @@ namespace Trill.Shared.Infrastructure.Modules
 
             foreach (var registration in registrations)
             {
-                if (!_registrations.TryGetValue(registration.ReceiverType, out var messageAttribute))
+                if (!_messages.TryGetValue(registration.ReceiverType, out var messageAttribute))
                 {
                     messageAttribute = registration.ReceiverType.GetCustomAttribute<MessageAttribute>();
                     if (message is ICommand)
@@ -65,15 +65,14 @@ namespace Trill.Shared.Infrastructure.Modules
                         module = registration.ReceiverType.GetModuleName();
                     }
 
-                    _registrations.TryAdd(registration.ReceiverType, messageAttribute);
+                    if (messageAttribute is not null)
+                    {
+                        _messages.TryAdd(registration.ReceiverType, messageAttribute);
+                    }
                 }
 
-                if (messageAttribute is null || !messageAttribute.Enabled)
-                {
-                    continue;
-                }
-
-                if (messageAttribute.Module != module)
+                if (messageAttribute is not null && !string.IsNullOrWhiteSpace(messageAttribute.Module) &&
+                    (!messageAttribute.Enabled || messageAttribute.Module != module))
                 {
                     continue;
                 }
@@ -86,6 +85,9 @@ namespace Trill.Shared.Infrastructure.Modules
             await Task.WhenAll(tasks);
         }
 
+        private T TranslateType<T>(object value)
+            => _serializer.Deserialize<T>(_serializer.Serialize(value));
+        
         private object TranslateType(object value, Type type)
             => _serializer.Deserialize(_serializer.Serialize(value), type);
     }

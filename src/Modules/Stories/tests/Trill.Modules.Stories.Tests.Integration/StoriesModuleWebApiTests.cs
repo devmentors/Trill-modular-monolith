@@ -91,7 +91,7 @@ namespace Trill.Modules.Stories.Tests.Integration
                 .InsertOneAsync(document);
         }
 
-        private static readonly Random Random = new Random();
+        private static readonly Random Random = new();
         private IUserRepository _userRepository;
 
         public StoriesModuleWebApiTests(WebApplicationFactory<Program> factory, MongoFixture mongo)
@@ -108,7 +108,7 @@ namespace Trill.Modules.Stories.Tests.Integration
 
         private class TestUserRepository : IUserRepository
         {
-            private readonly List<User> _users = new List<User>();
+            private readonly List<User> _users = new();
 
             public Task<User> GetAsync(UserId id) => Task.FromResult(_users.SingleOrDefault(x => x.Id.Equals(id)));
 

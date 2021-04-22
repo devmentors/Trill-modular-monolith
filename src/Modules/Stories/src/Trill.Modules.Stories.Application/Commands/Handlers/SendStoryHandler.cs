@@ -64,7 +64,7 @@ namespace Trill.Modules.Stories.Application.Commands.Handlers
             var visibility = command.VisibleFrom.HasValue && command.VisibleTo.HasValue
                 ? new Visibility(command.VisibleFrom.Value, command.VisibleTo.Value, command.Highlighted)
                 : Visibility.Default(now);
-            var storyId = command.StoryId == default ? _idGenerator.Generate() : command.StoryId;
+            var storyId = command.StoryId <= 0 ? _idGenerator.Generate() : command.StoryId;
             var story = Story.Create(storyId, author, command.Title, text, command.Tags, now, visibility);
             await _storyRepository.AddAsync(story);
             var domainEvents = story.Events.ToArray();

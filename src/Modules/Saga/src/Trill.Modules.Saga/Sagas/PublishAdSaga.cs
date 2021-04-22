@@ -22,14 +22,14 @@ namespace Trill.Modules.Saga.Sagas
             _messageBroker = messageBroker;
             _logger = logger;
         }
-        
+
         public override SagaId ResolveId(object message, ISagaContext context)
             => message switch
             {
-                AdApproved m => (SagaId) m.AdId.ToString(),
-                AdPaid m => (SagaId) m.AdId.ToString(),
-                AdPublished m => (SagaId) m.AdId.ToString(),
-                AdActionRejected m => (SagaId) m.AdId.ToString(),
+                AdApproved m => m.AdId.ToString(),
+                AdPaid m => m.AdId.ToString(),
+                AdPublished m => m.AdId.ToString(),
+                AdActionRejected m => m.AdId.ToString(),
                 _ => base.ResolveId(message, context)
             };
 

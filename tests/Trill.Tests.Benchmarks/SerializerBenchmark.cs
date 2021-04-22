@@ -13,7 +13,7 @@ namespace Trill.Tests.Benchmarks
         private readonly MessagePackSerializerOptions _messagePackSerializerOptions =
             MessagePack.Resolvers.ContractlessStandardResolver.Options;
 
-        private readonly Data _data = new Data
+        private readonly Data _data = new()
         {
             Id = Guid.NewGuid(),
             Name = "Test",

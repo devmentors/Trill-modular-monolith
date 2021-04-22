@@ -20,6 +20,6 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Documents
             Rate = rating.Rate;
         }
 
-        public StoryRating ToEntity() => new StoryRating(new StoryRatingId(StoryId, UserId), Rate);
+        public StoryRating ToEntity() => new(new StoryRatingId(StoryId, UserId), Rate);
     }
 }

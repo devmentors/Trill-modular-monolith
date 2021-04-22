@@ -18,9 +18,9 @@ namespace Trill.Modules.Users.Api
 {
     internal class UsersModule : IModule
     {
+        public const string BasePath = "users-module";
         public string Name { get; } = "Users";
-        public string Path { get; } = "users-module";
-        public string Schema { get; } = "users-module";
+        public string Path => BasePath;
 
         public void ConfigureServices(IServiceCollection services)
         {

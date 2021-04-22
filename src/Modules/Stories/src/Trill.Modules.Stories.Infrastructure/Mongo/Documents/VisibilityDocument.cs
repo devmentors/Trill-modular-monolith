@@ -20,6 +20,6 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Documents
             Highlighted = visibility.Highlighted;
         }
 
-        public Visibility ToValueObject() => new Visibility(From, To, Highlighted);
+        public Visibility ToValueObject() => new(From, To, Highlighted);
     }
 }

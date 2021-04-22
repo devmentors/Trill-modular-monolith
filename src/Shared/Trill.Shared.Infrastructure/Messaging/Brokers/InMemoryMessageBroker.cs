@@ -69,7 +69,7 @@ namespace Trill.Shared.Infrastructure.Messaging.Brokers
                     continue;
                 }
 
-                await _moduleClient.SendAsync(message);
+                await _moduleClient.PublishAsync(message);
             }
         }
     }

@@ -12,7 +12,7 @@ namespace Trill.Tests.Benchmarks
         private readonly IModuleSerializer _jsonSerializer = new JsonModuleSerializer();
         private readonly IModuleSerializer _messagePackSerializer = new MessagePackModuleSerializer();
 
-        private readonly Data _data = new Data
+        private readonly Data _data = new()
         {
             Id = Guid.NewGuid(),
             Name = "Test",

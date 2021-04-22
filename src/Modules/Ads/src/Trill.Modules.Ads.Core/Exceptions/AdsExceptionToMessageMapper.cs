@@ -24,6 +24,6 @@ namespace Trill.Modules.Ads.Core.Exceptions
             };
 
         private static AdActionRejected Map(Guid adId, Exception exception)
-            => new AdActionRejected(adId, exception.GetExceptionCode(), exception.Message);
+            => new(adId, exception.GetExceptionCode(), exception.Message);
     }
 }

@@ -37,6 +37,6 @@ namespace Trill.Modules.Stories.Core.ValueObjects
 
         public static Author Create(User user) => Create(user.Id, user.Name);
 
-        public static Author Create(Guid id, string name) => new Author(id, name);
+        public static Author Create(Guid id, string name) => new(id, name);
     }
 }

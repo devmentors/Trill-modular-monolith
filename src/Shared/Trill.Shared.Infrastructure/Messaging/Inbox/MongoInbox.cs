@@ -5,6 +5,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using Trill.Shared.Abstractions;
 using Trill.Shared.Abstractions.Messaging;
+using Trill.Shared.Abstractions.Time;
 using Trill.Shared.Infrastructure.Mongo;
 
 namespace Trill.Shared.Infrastructure.Messaging.Inbox
@@ -12,6 +13,7 @@ namespace Trill.Shared.Infrastructure.Messaging.Inbox
     internal sealed class MongoInbox : IInbox
     {
         private readonly IMongoSessionFactory _sessionFactory;
+        private readonly IClock _clock;
         private readonly IMongoDatabase _database;
         private readonly ILogger<MongoInbox> _logger;
         private readonly bool _transactionsEnabled;
@@ -20,9 +22,10 @@ namespace Trill.Shared.Infrastructure.Messaging.Inbox
         public bool Enabled { get; }
 
         public MongoInbox(IMongoSessionFactory sessionFactory, InboxOptions inboxOptions, MongoOptions mongoOptions,
-            IMongoDatabase database, ILogger<MongoInbox> logger)
+            IClock clock, IMongoDatabase database, ILogger<MongoInbox> logger)
         {
             _sessionFactory = sessionFactory;
+            _clock = clock;
             _database = database;
             _logger = logger;
             _transactionsEnabled = !mongoOptions.DisableTransactions;
@@ -72,7 +75,7 @@ namespace Trill.Shared.Infrastructure.Messaging.Inbox
                     CorrelationId = message.CorrelationId,
                     Name = message.GetType().Name.Underscore(),
                     Module = message.GetModuleName(),
-                    Timestamp = DateTime.UtcNow.ToUnixTimeMilliseconds()
+                    Timestamp = _clock.Current().ToUnixTimeMilliseconds()
                 });
                 if (session is {})
                 {

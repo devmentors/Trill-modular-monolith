@@ -44,7 +44,7 @@ namespace Trill.Modules.Stories.Core.Entities
         public static Story Create(StoryId id, Author author, string title, StoryText text, IEnumerable<string> tags,
             DateTime createdAt, Visibility visibility = null)
         {
-            var story = new Story(id, author, title, text, tags, createdAt, visibility);
+            var story = new Story(id, author, title, text, tags, createdAt, visibility) {Version = 0};
             story.AddEvent(new StoryCreated(story));
 
             return story;
@@ -63,6 +63,7 @@ namespace Trill.Modules.Stories.Core.Entities
             }
 
             Tags = tags.Select(x => x.ToLowerInvariant().Trim().Replace(" ", "-"));
+            IncrementVersion();
         }
     }
 }

@@ -9,9 +9,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Dispatchers;
 using Trill.Shared.Abstractions.Events;
@@ -22,15 +19,6 @@ namespace Trill.Shared.Infrastructure.Modules
 {
     public static class Extensions
     {
-        private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            Converters = new List<JsonConverter>
-            {
-                new StringEnumConverter(new CamelCaseNamingStrategy())
-            }
-        };
-        
         public static IModuleSubscriber UseModuleRequests(this IApplicationBuilder app)
             => app.ApplicationServices.GetRequiredService<IModuleSubscriber>();
         
@@ -73,9 +61,7 @@ namespace Trill.Shared.Infrastructure.Modules
             endpoint.MapGet("modules", context =>
             {
                 var moduleInfoProvider = context.RequestServices.GetRequiredService<ModuleInfoProvider>();
-                var json = JsonConvert.SerializeObject(moduleInfoProvider.Modules, SerializerSettings);
-                context.Response.ContentType = "application/json";
-                return context.Response.WriteAsync(json);
+                return context.Response.WriteAsJsonAsync(moduleInfoProvider.Modules);
             });
         }
         

@@ -25,6 +25,6 @@ namespace Trill.Modules.Stories.Infrastructure.Mongo.Documents
             Locked = user.Locked;
         }
 
-        public User ToEntity() => new User(Id, Name, CreatedAt, Rating, Locked);
+        public User ToEntity() => new(Id, Name, CreatedAt, Rating, Locked);
     }
 }

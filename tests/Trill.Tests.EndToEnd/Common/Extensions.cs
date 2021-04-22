@@ -1,16 +1,24 @@
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace Trill.Tests.EndToEnd.Common
 {
     internal static class Extensions
     {
+        private static readonly JsonSerializerOptions SerializerOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = {new JsonStringEnumConverter()}
+        };
+
         public static StringContent GetPayload(this object value)
-            => new StringContent(JsonConvert.SerializeObject(value), Encoding.UTF8, "application/json");
+            => new(JsonSerializer.Serialize(value, SerializerOptions), Encoding.UTF8, "application/json");
 
         public static async Task<T> ReadAsync<T>(this HttpResponseMessage response)
-            => JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+            => JsonSerializer.Deserialize<T>(await response.Content.ReadAsStringAsync(), SerializerOptions);
     }
 }
