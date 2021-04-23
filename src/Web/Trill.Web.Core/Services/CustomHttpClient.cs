@@ -101,7 +101,7 @@ namespace Trill.Web.Core.Services
                         return new ApiResponse<T>(default, response, false, new ApiResponse.ErrorResponse
                         {
                             Code = "error",
-                            Reason = payload
+                            Reason = String.IsNullOrWhiteSpace(payload) ? $"There was an error. HTTP code: {response.StatusCode}" : payload
                         });
                     }
 

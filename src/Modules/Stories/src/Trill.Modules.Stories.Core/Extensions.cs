@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Trill.Modules.Stories.Core.Factories;
-using Trill.Modules.Stories.Core.Policies;
 using Trill.Modules.Stories.Core.Services;
 
 [assembly: InternalsVisibleTo("Trill.Modules.Stories.Api")]
@@ -17,7 +16,6 @@ namespace Trill.Modules.Stories.Core
         public static IServiceCollection AddCore(this IServiceCollection services)
             => services
                 .AddScoped<IStoryRatingService, StoryRatingService>()
-                .AddSingleton<IStoryTextFactory, StoryTextFactory>()
-                .AddSingleton<IStoryAuthorPolicy, StoryAuthorPolicy>();
+                .AddSingleton<IStoryTextFactory, StoryTextFactory>();
     }
 }

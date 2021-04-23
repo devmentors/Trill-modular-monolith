@@ -26,7 +26,7 @@ namespace Trill.Web.UI.Services
             }
 
             await HandleErrorAsync(response);
-            return default;
+            return new ApiResponse(null, false);
         }
 
         public async Task<T> HandleAsync<T>(Task<ApiResponse<T>> request)
@@ -59,6 +59,11 @@ namespace Trill.Web.UI.Services
             if (response.Error is {})
             {
                 await _messageService.Error(response.Error.Reason, ModalDurationSeconds);
+            }
+            else
+            {
+                var content = await response.HttpResponse.Content.ReadAsStringAsync();
+                await _messageService.Error($"There was an error. HTTP code: {response.HttpResponse.StatusCode}. {content}");
             }
         }
     }

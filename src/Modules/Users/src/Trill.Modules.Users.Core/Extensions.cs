@@ -26,7 +26,6 @@ namespace Trill.Modules.Users.Core
         internal static IServiceCollection AddCore(this IServiceCollection services)
         {
             services
-                .AddExceptionToMessageMapper<UsersExceptionToMessageMapper>()
                 .AddSingleton<IJwtProvider, JwtProvider>()
                 .AddSingleton<IPasswordService, PasswordService>()
                 .AddSingleton<IPasswordHasher<IPasswordService>, PasswordHasher<IPasswordService>>()

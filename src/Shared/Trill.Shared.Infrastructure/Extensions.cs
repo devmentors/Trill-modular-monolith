@@ -11,12 +11,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Dispatchers;
-using Trill.Shared.Abstractions.Events;
 using Trill.Shared.Abstractions.Exceptions;
 using Trill.Shared.Abstractions.Generators;
-using Trill.Shared.Abstractions.Queries;
 using Trill.Shared.Abstractions.Storage;
 using Trill.Shared.Abstractions.Time;
 using Trill.Shared.Infrastructure.Api;
@@ -28,7 +25,6 @@ using Trill.Shared.Infrastructure.Events;
 using Trill.Shared.Infrastructure.Exceptions;
 using Trill.Shared.Infrastructure.Generators;
 using Trill.Shared.Infrastructure.Kernel;
-using Trill.Shared.Infrastructure.Logging;
 using Trill.Shared.Infrastructure.Messaging;
 using Trill.Shared.Infrastructure.Messaging.Dispatchers;
 using Trill.Shared.Infrastructure.Modules;
@@ -134,12 +130,6 @@ namespace Trill.Shared.Infrastructure
 
                     manager.FeatureProviders.Add(new InternalControllerFeatureProvider());
                 });
-
-            services.TryDecorate(typeof(ICommandHandler<>), typeof(UnitOfWorkCommandHandlerDecorator<>));
-            services.TryDecorate(typeof(IEventHandler<>), typeof(UnitOfWorkEventHandlerDecorator<>));
-            services.TryDecorate(typeof(IQueryHandler<,>), typeof(LoggingQueryHandlerDecorator<,>));
-            services.TryDecorate(typeof(ICommandHandler<>), typeof(LoggingCommandHandlerDecorator<>));
-            services.TryDecorate(typeof(IEventHandler<>), typeof(LoggingEventHandlerDecorator<>));
             
             var appOptions = services.GetOptions<AppOptions>(sectionName);
             services.AddSingleton(appOptions);            

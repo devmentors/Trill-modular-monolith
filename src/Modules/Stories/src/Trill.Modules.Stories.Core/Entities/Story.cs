@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Trill.Modules.Stories.Core.Events;
 using Trill.Modules.Stories.Core.Exceptions;
 using Trill.Modules.Stories.Core.ValueObjects;
 using Trill.Shared.Abstractions.Kernel;
@@ -45,7 +44,6 @@ namespace Trill.Modules.Stories.Core.Entities
             DateTime createdAt, Visibility visibility = null)
         {
             var story = new Story(id, author, title, text, tags, createdAt, visibility) {Version = 0};
-            story.AddEvent(new StoryCreated(story));
 
             return story;
         }

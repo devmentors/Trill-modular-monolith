@@ -1,4 +1,3 @@
-using Trill.Modules.Stories.Core.Events;
 using Trill.Modules.Stories.Core.ValueObjects;
 using Trill.Shared.Abstractions.Kernel;
 
@@ -16,7 +15,6 @@ namespace Trill.Modules.Stories.Core.Entities
         public static StoryRating Create(StoryId storyId, UserId userId, int rate, int totalRate)
         {
             var rating = new StoryRating(new StoryRatingId(storyId, userId), new Rate(rate));
-            rating.AddEvent(new StoryRatingChanged(rating, totalRate));
 
             return rating;
         }

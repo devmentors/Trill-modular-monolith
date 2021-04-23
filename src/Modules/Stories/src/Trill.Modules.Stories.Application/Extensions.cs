@@ -1,6 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
-using Trill.Modules.Stories.Application.Services;
 
 [assembly: InternalsVisibleTo("Trill.Modules.Stories.Api")]
 [assembly: InternalsVisibleTo("Trill.Modules.Stories.Infrastructure")]
@@ -13,6 +12,6 @@ namespace Trill.Modules.Stories.Application
     public static class Extensions
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
-            => services.AddSingleton<IEventMapper, EventMapper>();
+            => services;
     }
 }
