@@ -36,13 +36,15 @@ namespace Trill.Modules.Stories.Api
         public void ConfigureEndpoints(IEndpointRouteBuilder endpoints)
         {
             endpoints.MapGet(Path, ctx => ctx.Response.WriteAsync($"{Name} module"));
-
+            
             endpoints.Post<SendStory>($"{Path}/stories", after: (cmd, ctx) =>
             {
                 var storage = ctx.RequestServices.GetRequiredService<IStoryRequestStorage>();
                 var storyId = storage.GetStoryId(cmd.Id);
                 return ctx.Response.Created($"{Path}/stories/{storyId}");
             });
+
+            endpoints.Post<RateStory>($"{Path}/stories/{{storyId}}/rate");
         }
     }
 }
