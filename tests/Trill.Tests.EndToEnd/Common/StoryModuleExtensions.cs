@@ -12,7 +12,7 @@ namespace Trill.Tests.EndToEnd.Common
     {
         private const string Module = "stories-module";
 
-        public static async Task<long> SendStoryAsync(this HttpClient client, Guid userId)
+        public static Task<long> SendStoryAsync(this HttpClient client, Guid userId)
         {
             throw new NotImplementedException();
         }
