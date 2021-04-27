@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NSubstitute;
+using Trill.Modules.Stories.Application.Clients.Users;
 using Trill.Modules.Stories.Application.Commands;
 using Trill.Modules.Stories.Application.Commands.Handlers;
 using Trill.Modules.Stories.Application.Services;
 using Trill.Modules.Stories.Core.Entities;
 using Trill.Modules.Stories.Core.Factories;
+using Trill.Modules.Stories.Core.Policies;
 using Trill.Modules.Stories.Core.Repositories;
 using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Generators;
@@ -52,6 +54,8 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
         private readonly IClock _clock;
         private readonly IIdGenerator _idGenerator;
         private readonly IStoryRequestStorage _storyRequestStorage;
+        private readonly IStoryAuthorPolicy _storyAuthorPolicy;
+        private readonly IUsersApiClient _usersApiClient;
         private readonly ICommandHandler<SendStory> _handler;
 
         public SendStoryHandlerTests()
@@ -61,8 +65,10 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
             _clock = Substitute.For<IClock>();
             _idGenerator = Substitute.For<IIdGenerator>();
             _storyRequestStorage = Substitute.For<IStoryRequestStorage>();
+            _storyAuthorPolicy = Substitute.For<IStoryAuthorPolicy>();
+            _usersApiClient = Substitute.For<IUsersApiClient>();
             _handler = new SendStoryHandler(_storyRepository, _storyTextFactory, _clock, _idGenerator,
-                _storyRequestStorage);
+                _storyRequestStorage, _storyAuthorPolicy, _usersApiClient);
         }
 
         private static SendStory CreateCommand(long storyId, Guid userId)
