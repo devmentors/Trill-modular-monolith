@@ -4,9 +4,9 @@ using Trill.Shared.Abstractions.Queries;
 
 namespace Trill.Modules.Stories.Application.Queries
 {
-    internal class BrowseStories : PagedQueryBase, IQuery<Paged<StoryDto>>
+    internal class GetStory : IQuery<StoryDetailsDto>
     {
-        public string Query { get; set; }
-        public DateTime? Now { get; set; }
+        public long StoryId { get; set; }
+        public Guid? UserId { get; set; }
     }
 }

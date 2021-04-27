@@ -41,6 +41,7 @@ namespace Trill.Modules.Stories.Api
             endpoints.MapGet(Path, ctx => ctx.Response.WriteAsync($"{Name} module"));
 
             endpoints.Get<BrowseStories, Paged<StoryDto>>($"{Path}/stories");
+            endpoints.Get<GetStory, StoryDetailsDto>($"{Path}/stories/{{storyId}}");
             
             endpoints.Post<SendStory>($"{Path}/stories", after: (cmd, ctx) =>
             {
