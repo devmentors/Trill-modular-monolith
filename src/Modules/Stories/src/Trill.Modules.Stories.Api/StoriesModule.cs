@@ -5,9 +5,12 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Trill.Modules.Stories.Application;
 using Trill.Modules.Stories.Application.Commands;
+using Trill.Modules.Stories.Application.DTO;
+using Trill.Modules.Stories.Application.Queries;
 using Trill.Modules.Stories.Application.Services;
 using Trill.Modules.Stories.Core;
 using Trill.Modules.Stories.Infrastructure;
+using Trill.Shared.Abstractions.Queries;
 using Trill.Shared.Infrastructure.Api;
 using Trill.Shared.Infrastructure.Modules;
 
@@ -36,6 +39,8 @@ namespace Trill.Modules.Stories.Api
         public void ConfigureEndpoints(IEndpointRouteBuilder endpoints)
         {
             endpoints.MapGet(Path, ctx => ctx.Response.WriteAsync($"{Name} module"));
+
+            endpoints.Get<BrowseStories, Paged<StoryDto>>($"{Path}/stories");
             
             endpoints.Post<SendStory>($"{Path}/stories", after: (cmd, ctx) =>
             {

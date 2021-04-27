@@ -1,8 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Trill.Modules.Stories.Application.Commands;
+using Trill.Modules.Stories.Application.DTO;
+using Trill.Modules.Stories.Application.Queries;
 using Trill.Modules.Stories.Application.Services;
 using Trill.Shared.Abstractions.Dispatchers;
+using Trill.Shared.Abstractions.Queries;
 
 namespace Trill.Modules.Stories.Api.Controllers
 {
@@ -18,6 +21,10 @@ namespace Trill.Modules.Stories.Api.Controllers
             _dispatcher = dispatcher;
             _storyRequestStorage = storyRequestStorage;
         }
+
+        [HttpGet]
+        public async Task<ActionResult<Paged<StoryDto>>> Get([FromQuery] BrowseStories query)
+            => Ok(await _dispatcher.QueryAsync(query));
 
         [HttpPost]
         public async Task<ActionResult> Post(SendStory command)

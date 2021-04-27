@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Trill.Modules.Stories.Core.Entities;
 

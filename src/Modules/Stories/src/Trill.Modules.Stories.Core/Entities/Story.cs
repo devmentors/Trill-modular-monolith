@@ -21,7 +21,7 @@ namespace Trill.Modules.Stories.Core.Entities
             get => _tags;
             private set => _tags = new HashSet<string>(value);
         }
-
+        
         public DateTime CreatedAt { get; }
 
         public Story(StoryId id, Author author, string title, StoryText text, IEnumerable<string> tags,
