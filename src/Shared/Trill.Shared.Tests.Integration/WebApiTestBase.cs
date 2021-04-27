@@ -117,6 +117,7 @@ namespace Trill.Shared.Tests.Integration
 
         public virtual void Dispose()
         {
+            Mongo.Dispose();
         }
 
         #endregion
