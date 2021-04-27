@@ -60,7 +60,7 @@ namespace Trill.Modules.Stories.Application.Commands.Handlers
                 throw new CannotCreateStoryException(command.UserId);
             }
             
-            var author = Author.Create(command.UserId, $"user-{command.UserId:N}"); // Non-existent user for now
+            var author = Author.Create(user);
             var text = _storyTextFactory.Create(command.Text);
             var now = _clock.Current();
             var visibility = command.VisibleFrom.HasValue && command.VisibleTo.HasValue
