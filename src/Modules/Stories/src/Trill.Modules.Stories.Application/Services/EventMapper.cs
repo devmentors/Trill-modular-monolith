@@ -19,6 +19,8 @@ namespace Trill.Modules.Stories.Application.Services
                     e.Story.Title, e.Story.Tags, e.Story.CreatedAt,
                     new StorySent.VisibilityModel(e.Story.Visibility.From, e.Story.Visibility.To,
                         e.Story.Visibility.Highlighted)),
+                StoryRatingChanged e => new StoryRated(e.StoryRating.Id.StoryId, e.StoryRating.Id.UserId,
+                    e.StoryRating.Rate, e.TotalRate),
                 _ => null
             };
     }
