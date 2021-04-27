@@ -53,7 +53,7 @@ namespace Trill.Modules.Stories.Application.Commands.Handlers
             var rating = await _storyRatingService.RateAsync(story, user, command.Rate);
             await _storyRatingRepository.SetAsync(rating);
             
-            var domainEvents = story.Events.ToArray();
+            var domainEvents = rating.Events.ToArray();
             await _domainEventDispatcher.DispatchAsync(domainEvents);
             
             var integrationEvents = _eventMapper.Map(domainEvents).ToArray();
