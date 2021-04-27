@@ -24,6 +24,9 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
         public async Task story_should_be_added_given_valid_data()
         {
             var command = CreateCommand(1, Guid.NewGuid());
+            var user = new User(command.UserId, "test", DateTime.UtcNow);
+            _userRepository.GetAsync(command.UserId).Returns(user);
+            _storyAuthorPolicy.CanCreate(user).Returns(true);
         
             await Act(command);
         
@@ -40,6 +43,9 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
             const int storyId = 1;
             var command = CreateCommand(0, Guid.NewGuid());
             _idGenerator.Generate().Returns(storyId);
+            var user = new User(command.UserId, "test", DateTime.UtcNow);
+            _userRepository.GetAsync(command.UserId).Returns(user);
+            _storyAuthorPolicy.CanCreate(user).Returns(true);
 
             await Act(command);
 
