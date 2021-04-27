@@ -14,21 +14,21 @@ namespace Trill.Modules.Stories.Application.Commands.Handlers
         private readonly IStoryRatingRepository _storyRatingRepository;
         private readonly IStoryRepository _storyRepository;
         private readonly IStoryRatingService _storyRatingService;
-        private readonly IUsersApiClient _usersApiClient;
+        private readonly IUserRepository _userRepository;
 
         public RateStoryHandler(IStoryRatingRepository storyRatingRepository, IStoryRepository storyRepository,
-            IStoryRatingService storyRatingService, IUsersApiClient usersApiClient)
+            IStoryRatingService storyRatingService, IUserRepository userRepository)
         {
             _storyRatingRepository = storyRatingRepository;
             _storyRepository = storyRepository;
             _storyRatingService = storyRatingService;
-            _usersApiClient = usersApiClient;
+            _userRepository = userRepository;
         }
 
         public async Task HandleAsync(RateStory command)
         {
-            var userDto = await _usersApiClient.GetAsync(command.UserId);
-            if (userDto is null)
+            var user = await _userRepository.GetAsync(command.UserId);
+            if (user is null)
             {
                 throw new UserNotFoundException(command.UserId);
             }
@@ -39,7 +39,6 @@ namespace Trill.Modules.Stories.Application.Commands.Handlers
                 throw new StoryNotFoundException(command.StoryId);
             }
         
-            var user = new User(command.UserId, $"user-{command.UserId:N}", DateTime.UtcNow); // Non-existent user for now
             var rating = await _storyRatingService.RateAsync(story, user, command.Rate);
             await _storyRatingRepository.SetAsync(rating);
         }

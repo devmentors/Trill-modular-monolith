@@ -55,7 +55,7 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
         private readonly IIdGenerator _idGenerator;
         private readonly IStoryRequestStorage _storyRequestStorage;
         private readonly IStoryAuthorPolicy _storyAuthorPolicy;
-        private readonly IUsersApiClient _usersApiClient;
+        private readonly IUserRepository _userRepository;
         private readonly ICommandHandler<SendStory> _handler;
 
         public SendStoryHandlerTests()
@@ -66,9 +66,9 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
             _idGenerator = Substitute.For<IIdGenerator>();
             _storyRequestStorage = Substitute.For<IStoryRequestStorage>();
             _storyAuthorPolicy = Substitute.For<IStoryAuthorPolicy>();
-            _usersApiClient = Substitute.For<IUsersApiClient>();
+            _userRepository = Substitute.For<IUserRepository>();
             _handler = new SendStoryHandler(_storyRepository, _storyTextFactory, _clock, _idGenerator,
-                _storyRequestStorage, _storyAuthorPolicy, _usersApiClient);
+                _storyRequestStorage, _storyAuthorPolicy, _userRepository);
         }
 
         private static SendStory CreateCommand(long storyId, Guid userId)

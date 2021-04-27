@@ -21,11 +21,11 @@ namespace Trill.Modules.Stories.Application.Commands.Handlers
         private readonly IIdGenerator _idGenerator;
         private readonly IStoryRequestStorage _storyRequestStorage;
         private readonly IStoryAuthorPolicy _storyAuthorPolicy;
-        private readonly IUsersApiClient _usersApiClient;
+        private readonly IUserRepository _userRepository;
 
         public SendStoryHandler(IStoryRepository storyRepository, IStoryTextFactory storyTextFactory,
             IClock clock, IIdGenerator idGenerator, IStoryRequestStorage storyRequestStorage,
-            IStoryAuthorPolicy storyAuthorPolicy, IUsersApiClient usersApiClient)
+            IStoryAuthorPolicy storyAuthorPolicy, IUserRepository userRepository)
         {
             _storyRepository = storyRepository;
             _storyTextFactory = storyTextFactory;
@@ -33,18 +33,21 @@ namespace Trill.Modules.Stories.Application.Commands.Handlers
             _idGenerator = idGenerator;
             _storyRequestStorage = storyRequestStorage;
             _storyAuthorPolicy = storyAuthorPolicy;
-            _usersApiClient = usersApiClient;
+            _userRepository = userRepository;
         }
 
         public async Task HandleAsync(SendStory command)
         {
-            var userDto = await _usersApiClient.GetAsync(command.UserId);
-            if (userDto is null)
+            var user = await _userRepository.GetAsync(command.UserId);
+            if (user is null)
             {
                 throw new UserNotFoundException(command.UserId);
             }
-            
-            // _storyAuthorPolicy.CanCreate()
+
+            if (!_storyAuthorPolicy.CanCreate(user))
+            {
+                throw new CannotCreateStoryException(command.UserId);
+            }
             
             var author = Author.Create(command.UserId, $"user-{command.UserId:N}"); // Non-existent user for now
             var text = _storyTextFactory.Create(command.Text);
