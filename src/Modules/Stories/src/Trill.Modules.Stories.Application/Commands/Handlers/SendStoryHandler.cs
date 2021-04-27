@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Trill.Modules.Stories.Application.Clients.Users;
+using Trill.Modules.Stories.Application.Events;
 using Trill.Modules.Stories.Application.Exceptions;
 using Trill.Modules.Stories.Application.Services;
 using Trill.Modules.Stories.Core.Entities;
@@ -9,6 +11,8 @@ using Trill.Modules.Stories.Core.Repositories;
 using Trill.Modules.Stories.Core.ValueObjects;
 using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Generators;
+using Trill.Shared.Abstractions.Kernel;
+using Trill.Shared.Abstractions.Messaging;
 using Trill.Shared.Abstractions.Time;
 
 namespace Trill.Modules.Stories.Application.Commands.Handlers
@@ -22,10 +26,14 @@ namespace Trill.Modules.Stories.Application.Commands.Handlers
         private readonly IStoryRequestStorage _storyRequestStorage;
         private readonly IStoryAuthorPolicy _storyAuthorPolicy;
         private readonly IUserRepository _userRepository;
+        private readonly IDomainEventDispatcher _domainEventDispatcher;
+        private readonly IEventMapper _eventMapper;
+        private readonly IMessageBroker _messageBroker;
 
         public SendStoryHandler(IStoryRepository storyRepository, IStoryTextFactory storyTextFactory,
             IClock clock, IIdGenerator idGenerator, IStoryRequestStorage storyRequestStorage,
-            IStoryAuthorPolicy storyAuthorPolicy, IUserRepository userRepository)
+            IStoryAuthorPolicy storyAuthorPolicy, IUserRepository userRepository,
+            IDomainEventDispatcher domainEventDispatcher, IEventMapper eventMapper, IMessageBroker messageBroker)
         {
             _storyRepository = storyRepository;
             _storyTextFactory = storyTextFactory;
@@ -34,6 +42,9 @@ namespace Trill.Modules.Stories.Application.Commands.Handlers
             _storyRequestStorage = storyRequestStorage;
             _storyAuthorPolicy = storyAuthorPolicy;
             _userRepository = userRepository;
+            _domainEventDispatcher = domainEventDispatcher;
+            _eventMapper = eventMapper;
+            _messageBroker = messageBroker;
         }
 
         public async Task HandleAsync(SendStory command)
@@ -58,6 +69,13 @@ namespace Trill.Modules.Stories.Application.Commands.Handlers
             var storyId = command.StoryId <= 0 ? _idGenerator.Generate() : command.StoryId;
             var story = Story.Create(storyId, author, command.Title, text, command.Tags, now, visibility);
             await _storyRepository.AddAsync(story);
+            
+            var domainEvents = story.Events.ToArray();
+            await _domainEventDispatcher.DispatchAsync(domainEvents);
+            
+            var integrationEvents = _eventMapper.Map(domainEvents).ToArray();
+            await _messageBroker.PublishAsync(integrationEvents);
+            
             _storyRequestStorage.SetStoryId(command.Id, story.Id);
         }
     }

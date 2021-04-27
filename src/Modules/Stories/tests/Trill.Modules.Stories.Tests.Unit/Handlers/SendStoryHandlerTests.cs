@@ -11,6 +11,8 @@ using Trill.Modules.Stories.Core.Policies;
 using Trill.Modules.Stories.Core.Repositories;
 using Trill.Shared.Abstractions.Commands;
 using Trill.Shared.Abstractions.Generators;
+using Trill.Shared.Abstractions.Kernel;
+using Trill.Shared.Abstractions.Messaging;
 using Trill.Shared.Abstractions.Time;
 using Xunit;
 
@@ -62,6 +64,9 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
         private readonly IStoryRequestStorage _storyRequestStorage;
         private readonly IStoryAuthorPolicy _storyAuthorPolicy;
         private readonly IUserRepository _userRepository;
+        private readonly IMessageBroker _messageBroker;
+        private readonly IEventMapper _eventMapper;
+        private readonly IDomainEventDispatcher _domainEventDispatcher;
         private readonly ICommandHandler<SendStory> _handler;
 
         public SendStoryHandlerTests()
@@ -73,8 +78,12 @@ namespace Trill.Modules.Stories.Tests.Unit.Handlers
             _storyRequestStorage = Substitute.For<IStoryRequestStorage>();
             _storyAuthorPolicy = Substitute.For<IStoryAuthorPolicy>();
             _userRepository = Substitute.For<IUserRepository>();
+            _domainEventDispatcher = Substitute.For<IDomainEventDispatcher>();
+            _eventMapper = Substitute.For<IEventMapper>();
+            _messageBroker = Substitute.For<IMessageBroker>();
             _handler = new SendStoryHandler(_storyRepository, _storyTextFactory, _clock, _idGenerator,
-                _storyRequestStorage, _storyAuthorPolicy, _userRepository);
+                _storyRequestStorage, _storyAuthorPolicy, _userRepository, _domainEventDispatcher, _eventMapper,
+                _messageBroker);
         }
 
         private static SendStory CreateCommand(long storyId, Guid userId)
